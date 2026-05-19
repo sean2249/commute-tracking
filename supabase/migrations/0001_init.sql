@@ -78,12 +78,12 @@ group by direction, weekday;
 
 create or replace function commute.check_secret(p_secret text) returns boolean
 language plpgsql security definer
-set search_path = commute, public
+set search_path = commute, public, extensions
 as $$
 declare h text;
 begin
   select value into h from commute.config where key = 'secret_hash';
-  return h is not null and h = crypt(p_secret, h);
+  return h is not null and h = extensions.crypt(p_secret, h);
 end;
 $$;
 
@@ -101,11 +101,14 @@ language plpgsql security definer
 set search_path = commute, public
 as $$
 declare
-  v_now    timestamptz := now();
-  v_local  timestamptz := v_now at time zone 'Asia/Taipei';
-  v_id     uuid;
-  v_pred   record;
-  v_src    text := null;
+  v_now     timestamptz := now();
+  v_local   timestamp   := (v_now at time zone 'Asia/Taipei');
+  v_weekday smallint    := extract(isodow from v_local)::smallint;
+  v_date    date        := v_local::date;
+  v_time    time        := v_local::time;
+  v_id      uuid;
+  v_pred    record;
+  v_src     text        := null;
 begin
   if not commute.check_secret(p_secret) then
     raise exception 'unauthorized' using errcode = '42501';
@@ -121,14 +124,14 @@ begin
   insert into commute.events
     (event_at, local_date, local_time, weekday, direction, event, weather, temp_c, lat, lon, note)
   values
-    (v_now, v_local::date, v_local::time, extract(isodow from v_local)::smallint,
+    (v_now, v_date, v_time, v_weekday,
      p_direction, p_event, p_weather, p_temp_c, p_lat, p_lon, p_note)
   returning id into v_id;
 
   if p_event = 'board' then
     select * into v_pred from commute.predictions
     where direction = p_direction
-      and weekday   = extract(isodow from v_local)::smallint
+      and weekday   = v_weekday
       and weather   = p_weather
       and n >= 3;
     if found then v_src := 'weather'; end if;
@@ -136,7 +139,7 @@ begin
     if not found then
       select * into v_pred from commute.predictions_weekday
       where direction = p_direction
-        and weekday   = extract(isodow from v_local)::smallint
+        and weekday   = v_weekday
         and n >= 3;
       if found then v_src := 'weekday'; end if;
     end if;
@@ -145,9 +148,9 @@ begin
   return jsonb_build_object(
     'id', v_id,
     'logged_at', v_now,
-    'local_date', v_local::date,
-    'local_time', v_local::time,
-    'weekday', extract(isodow from v_local)::smallint,
+    'local_date', v_date,
+    'local_time', v_time,
+    'weekday', v_weekday,
     'prediction', case when v_pred is null then null else
       jsonb_build_object(
         'median_min', v_pred.median_min,

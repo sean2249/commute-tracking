@@ -17,9 +17,11 @@ const SHELL = [
   '/js/weather.js',
   '/js/time.js',
   '/js/pwa.js',
+  '/js/icons.js',
   '/js/index-page.js',
   '/js/log-page.js',
   '/js/charts-page.js',
+  '/js/unlock-page.js',
 ];
 
 self.addEventListener('install', (e) => {

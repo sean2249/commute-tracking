@@ -13,20 +13,29 @@ form.addEventListener('submit', async (e) => {
   input.setAttribute('aria-invalid', 'false');
   button.disabled = true;
   button.textContent = 'Checking…';
-  setSecret(candidate);
-  const ok = await verifySecret(candidate);
+
+  let ok = false;
+  let errMsg = 'Incorrect secret.';
+  try {
+    ok = await verifySecret(candidate);
+  } catch (err) {
+    errMsg = 'Verification failed: ' + (err?.message || 'network error');
+  }
+
   if (ok) {
+    setSecret(candidate);
     button.textContent = 'Unlocked';
     setTimeout(() => location.replace('/index.html'), 200);
-  } else {
-    clearSecret();
-    input.setAttribute('aria-invalid', 'true');
-    input.value = '';
-    errSlot.textContent = 'Incorrect secret.';
-    form.classList.add('shake');
-    setTimeout(() => form.classList.remove('shake'), 240);
-    button.disabled = false;
-    button.textContent = 'Unlock';
-    input.focus();
+    return;
   }
+
+  clearSecret();
+  input.setAttribute('aria-invalid', 'true');
+  input.value = '';
+  errSlot.textContent = errMsg;
+  form.classList.add('shake');
+  setTimeout(() => form.classList.remove('shake'), 240);
+  button.disabled = false;
+  button.textContent = 'Unlock';
+  input.focus();
 });

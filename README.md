@@ -44,10 +44,6 @@ cd public && python3 -m http.server 8080
 開 `http://localhost:8080/unlock.html`，貼 secret → 進首頁。
 首次按按鈕會跳定位權限；拒絕時 weather 走 `unknown` fallback。
 
-## 設計
-
-詳細 UI/UX 規格與技術選型在 plan：`/root/.claude/plans/commute-tracking-dapper-scroll.md`（本機）。
-
 ## 兩階段
 
 - **Phase 1**（本版）：migration、4 大按鈕、log/charts 頁、預測（樣本不足回 null）、PWA。
