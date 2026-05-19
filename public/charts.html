@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Charts · Commute</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/charts.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="back" href="/index.html" aria-label="Back" data-icon="chevronLeft" data-size="22"></a>
+    <h1>Charts</h1>
+    <span style="width:44px"></span>
+  </header>
+
+  <div class="aggregate-row">
+    <div class="aggregate-cell"><div id="agg-events" class="num">—</div><div class="label">Events</div></div>
+    <div class="aggregate-cell"><div id="agg-paired" class="num">—</div><div class="label">Paired</div></div>
+    <div class="aggregate-cell"><div id="agg-avg" class="num">—</div><div class="label">7d avg</div></div>
+    <div class="aggregate-cell"><div id="agg-missing" class="num">—</div><div class="label">Missing alight</div></div>
+  </div>
+
+  <div class="charts-grid">
+    <section id="section-trend" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration trend</h2>
+        <span id="n-trend" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
+    </section>
+
+    <section id="section-scatter" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Boarding time</h2>
+        <span id="n-scatter" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-scatter"></canvas></div>
+    </section>
+
+    <section id="section-weather" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> By weather</h2>
+        <span id="n-weather" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">分組樣本偏少，請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-weather"></canvas></div>
+    </section>
+
+    <section id="section-weekday" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> By weekday</h2>
+        <span id="n-weekday" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">分組樣本偏少，請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-weekday"></canvas></div>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <a href="/index.html" aria-label="Home" data-icon="home" data-size="22"></a>
+    <a href="/log.html" aria-label="Log" data-icon="list" data-size="22"></a>
+    <a href="/charts.html" aria-current="page" aria-label="Charts" data-icon="barChart" data-size="22"></a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script type="module" src="/js/pwa.js"></script>
+  <script type="module" src="/js/charts-page.js"></script>
+</body>
+</html>

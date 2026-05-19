@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Log · Commute</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/log.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="back" href="/index.html" aria-label="Back" data-icon="chevronLeft" data-size="22"></a>
+    <h1>Log</h1>
+    <span style="width:44px"></span>
+  </header>
+
+  <div id="filter-chips" class="filter-chips">
+    <div class="filter-group">
+      <button class="chip" type="button" data-group="event" data-value="" aria-pressed="true">All</button>
+      <button class="chip" type="button" data-group="event" data-value="board" aria-pressed="false">Board</button>
+      <button class="chip" type="button" data-group="event" data-value="alight" aria-pressed="false">Alight</button>
+    </div>
+    <div class="filter-group">
+      <button class="chip" type="button" data-group="direction" data-value="to_work" aria-pressed="false">↑ Work</button>
+      <button class="chip" type="button" data-group="direction" data-value="from_work" aria-pressed="false">↓ Home</button>
+    </div>
+    <div class="filter-group">
+      <button class="chip" type="button" data-group="weather" data-value="clear" aria-pressed="false">Clear</button>
+      <button class="chip" type="button" data-group="weather" data-value="cloudy" aria-pressed="false">Cloudy</button>
+      <button class="chip" type="button" data-group="weather" data-value="rain" aria-pressed="false">Rain</button>
+    </div>
+  </div>
+
+  <div class="log-header">
+    <span>Date</span>
+    <span>Time</span>
+    <span>Wk</span>
+    <span>Dir</span>
+    <span>Event</span>
+    <span>Wx</span>
+    <span>Temp</span>
+    <span>Note</span>
+  </div>
+  <ul id="log-list" class="log-list">
+    <li class="log-row"><div class="skeleton" style="height:32px;margin:4px"></div></li>
+  </ul>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <a href="/index.html" aria-label="Home" data-icon="home" data-size="22"></a>
+    <a href="/log.html" aria-current="page" aria-label="Log" data-icon="list" data-size="22"></a>
+    <a href="/charts.html" aria-label="Charts" data-icon="barChart" data-size="22"></a>
+  </nav>
+
+  <script type="module" src="/js/pwa.js"></script>
+  <script type="module" src="/js/log-page.js"></script>
+</body>
+</html>
