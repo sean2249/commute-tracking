@@ -1,0 +1,81 @@
+.unlock-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
+  gap: var(--sp-6);
+}
+
+.unlock-page > * {
+  width: 100%;
+  max-width: 360px;
+}
+
+.unlock-page h1 {
+  font-size: var(--fs-2xl);
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+.unlock-page .sub {
+  text-align: center;
+  color: var(--fg-muted);
+  margin: 0;
+  font-size: var(--fs-base);
+}
+
+.unlock-page input[type="password"] {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: var(--fs-base);
+}
+
+.unlock-page input[type="password"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.unlock-page input[type="password"][aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.unlock-page button {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+}
+
+.unlock-page button:active { background: var(--accent-hover); }
+
+.unlock-page .error-slot {
+  min-height: 24px;
+  color: var(--danger);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+.unlock-page .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  animation: unlockIn 280ms var(--ease-out);
+}
+
+@keyframes unlockIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
