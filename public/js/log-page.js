@@ -56,7 +56,7 @@ function render() {
       <li class="empty-state">
         <div class="icon-lg">${ICONS.list(48)}</div>
         <div>${allEvents.length === 0 ? '尚無紀錄。' : '此篩選下無資料。'}</div>
-        ${allEvents.length === 0 ? '<a href="/index.html" class="btn btn-primary">回首頁紀錄</a>' : ''}
+        ${allEvents.length === 0 ? '<a href="index.html" class="btn btn-primary">回首頁紀錄</a>' : ''}
       </li>`;
     return;
   }

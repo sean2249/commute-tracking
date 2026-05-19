@@ -208,7 +208,7 @@ async function refreshRecent() {
     const wxUnavailable = isWeatherUnavailable(e.weather);
     return `
       <li>
-        <a href="/log.html#${e.id}">
+        <a href="log.html#${e.id}">
           <span class="mono date">${formatDate(e.local_date)}</span>
           <span class="mono time">${formatTime(e.local_time)}</span>
           <span class="wkday muted">${weekdayShort(e.weekday)}</span>

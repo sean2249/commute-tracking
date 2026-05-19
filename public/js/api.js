@@ -21,10 +21,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: false },
 });
 
-const isUnlockPage = location.pathname.endsWith('/unlock.html') || location.pathname === '/unlock';
+const isUnlockPage = location.pathname.endsWith('/unlock.html') || location.pathname.endsWith('/unlock');
 
 if (!secret && !isUnlockPage) {
-  location.replace('/unlock.html');
+  location.replace('unlock.html');
 }
 
 export function clearSecret() {

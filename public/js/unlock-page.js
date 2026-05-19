@@ -25,7 +25,7 @@ form.addEventListener('submit', async (e) => {
   if (ok) {
     setSecret(candidate);
     button.textContent = 'Unlocked';
-    setTimeout(() => location.replace('/index.html'), 200);
+    setTimeout(() => location.replace('index.html'), 200);
     return;
   }
 
