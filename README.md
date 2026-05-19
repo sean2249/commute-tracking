@@ -31,7 +31,7 @@ supabase/migrations/
    把 `your-random-secret-here` 換成你自選的字串（不會出現在前端原始碼）。
 4. **填 Supabase URL 與 anon key**：編輯 `public/js/config.js`，把 `REPLACE_ME` 換成 Dashboard → Settings → API 裡的值。
    anon key 是 public 的、可以出現在前端；安全靠 RLS 完全擋住 anon 直接讀寫 + RPC 內 bcrypt 比對 secret。
-5. **部署靜態**：把 `public/` 目錄丟到 Cloudflare Pages / GitHub Pages / Netlify / Vercel static 都可。
+5. **部署到 GitHub Pages**：merge 到 `main` 後，`.github/workflows/pages.yml` 會自動把 `public/` 上傳成 Pages artifact。第一次需到 repo Settings → Pages → Source 選 **GitHub Actions**。完成後網址為 `https://<user>.github.io/<repo>/`（例如 `https://sean2249.github.io/commute-tracking/`）。
 6. **iPhone 安裝**：Safari 打開 `https://<your-domain>/?key=<your-secret>` → localStorage 儲存 secret → 分享 → 加入主畫面。之後從圖示開即可。
 
 ## 本地開發
