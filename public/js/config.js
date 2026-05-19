@@ -1,5 +1,5 @@
-// Fill these in after creating your Supabase project.
-// SUPABASE_URL: e.g. https://abcd1234.supabase.co
-// SUPABASE_ANON_KEY: the public anon key (safe to expose; access is gated by RPC + bcrypt secret).
-export const SUPABASE_URL = window.__COMMUTE_CONFIG__?.SUPABASE_URL ?? 'REPLACE_ME';
-export const SUPABASE_ANON_KEY = window.__COMMUTE_CONFIG__?.SUPABASE_ANON_KEY ?? 'REPLACE_ME';
+// Supabase project: food-picker (xwqgrpfcuohpstqinkxb), region ap-south-1.
+// Schema isolated to `commute`; publishable key is safe to ship in client code —
+// access is gated by RLS (deny-all to anon) + RPC bcrypt secret comparison.
+export const SUPABASE_URL = 'https://xwqgrpfcuohpstqinkxb.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_AreTk-QXvZCFUM5J4oP46w_TXvCc-Y0';

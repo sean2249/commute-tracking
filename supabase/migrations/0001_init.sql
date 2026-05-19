@@ -29,6 +29,10 @@ create table commute.config (
   value text not null
 );
 
+alter table commute.config enable row level security;
+-- Intentionally no policies: only SECURITY DEFINER functions (commute.check_secret)
+-- can read this table. Anon key cannot touch the secret hash directly.
+
 create or replace view commute.durations as
 select
   b.local_date,
