@@ -35,7 +35,7 @@ export function setSecret(value) {
   localStorage.setItem(SECRET_KEY, value);
 }
 
-export async function logEvent({ direction, event, weather, temp_c, lat, lon, note }) {
+export async function logEvent({ direction, event, weather, temp_c, lat, lon }) {
   return supabase.rpc('log_event', {
     p_secret: secret,
     p_direction: direction,
@@ -44,7 +44,7 @@ export async function logEvent({ direction, event, weather, temp_c, lat, lon, no
     p_temp_c: temp_c ?? null,
     p_lat: lat ?? null,
     p_lon: lon ?? null,
-    p_note: note ?? null,
+    p_note: null,
   });
 }
 
@@ -56,8 +56,15 @@ export async function deleteEvent(id) {
   return supabase.rpc('delete_event', { p_secret: secret, p_id: id });
 }
 
-export async function updateNote(id, note) {
-  return supabase.rpc('update_note', { p_secret: secret, p_id: id, p_note: note });
+export async function updateWeather(id, { weather, temp_c, lat, lon }) {
+  return supabase.rpc('update_weather', {
+    p_secret: secret,
+    p_id: id,
+    p_weather: weather ?? 'unknown',
+    p_temp_c: temp_c ?? null,
+    p_lat: lat ?? null,
+    p_lon: lon ?? null,
+  });
 }
 
 export async function fetchStats() {

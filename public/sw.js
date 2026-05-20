@@ -1,4 +1,4 @@
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL = [
   './',
   './index.html',
@@ -18,6 +18,9 @@ const SHELL = [
   './js/time.js',
   './js/pwa.js',
   './js/icons.js',
+  './js/pair.js',
+  './js/openBoard.js',
+  './js/reminder.js',
   './js/index-page.js',
   './js/log-page.js',
   './js/charts-page.js',
@@ -57,4 +60,17 @@ self.addEventListener('fetch', (e) => {
       });
     })
   );
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of all) {
+      if (client.url.includes('/index.html') || client.url.endsWith('/')) {
+        return client.focus();
+      }
+    }
+    return self.clients.openWindow('./index.html');
+  })());
 });

@@ -13,6 +13,16 @@ export function categorize(code) {
   return 'unknown';
 }
 
+export const WEATHER_REASON_LABELS = {
+  ok: '',
+  unsupported: '此瀏覽器不支援定位',
+  denied: '位置權限被拒絕',
+  position_unavailable: '無法取得位置',
+  position_timeout: '定位逾時',
+  weather_timeout: '天氣 API 逾時',
+  weather_http: '天氣 API 錯誤',
+};
+
 export async function getWeather(lat, lon, timeoutMs = 5000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -37,7 +47,7 @@ export async function getWeather(lat, lon, timeoutMs = 5000) {
 export async function locateAndFetchWeather() {
   let lat = null, lon = null, weather = 'unknown', temp = null;
   if (!('geolocation' in navigator)) {
-    return { lat, lon, weather, temp_c: temp };
+    return { lat, lon, weather, temp_c: temp, reason: 'unsupported' };
   }
   try {
     const pos = await new Promise((res, rej) =>
@@ -45,15 +55,22 @@ export async function locateAndFetchWeather() {
     );
     lat = pos.coords.latitude;
     lon = pos.coords.longitude;
-  } catch {
-    return { lat, lon, weather, temp_c: temp };
+  } catch (err) {
+    const code = err && typeof err.code === 'number' ? err.code : 0;
+    const reason =
+      code === 1 ? 'denied' :
+      code === 2 ? 'position_unavailable' :
+      code === 3 ? 'position_timeout' :
+      'position_unavailable';
+    return { lat, lon, weather, temp_c: temp, reason };
   }
   try {
     const w = await getWeather(lat, lon);
     weather = w.category;
     temp = w.temp_c;
-  } catch {
-    // keep fallback
+  } catch (err) {
+    const reason = err && err.name === 'AbortError' ? 'weather_timeout' : 'weather_http';
+    return { lat, lon, weather, temp_c: temp, reason };
   }
-  return { lat, lon, weather, temp_c: temp };
+  return { lat, lon, weather, temp_c: temp, reason: 'ok' };
 }

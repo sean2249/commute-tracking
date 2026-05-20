@@ -21,6 +21,7 @@ export const ICONS = {
   cloudRain: (s = 16) => svg(s, '<path d="M16 13a4 4 0 1 0-1-7.87 6 6 0 1 0-10 3.87"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="16" y1="19" x2="16" y2="21"/>'),
   wind: (s = 16) => svg(s, '<path d="M9.59 4.59A2 2 0 1 1 11 8H2"/><path d="M17 8a2 2 0 1 1 1.41 3.41"/><path d="M9.59 19.41A2 2 0 1 0 11 16H2"/>'),
   helpCircle: (s = 16) => svg(s, '<circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+  refresh: (s = 16) => svg(s, '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>'),
 };
 
 export function weatherIcon(category, size = 16) {
