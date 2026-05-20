@@ -34,8 +34,19 @@ export function markNotified() {
 export function reconcileWithServer(serverEvents) {
   const ob = getOpenBoard();
   if (!ob) return null;
-  const found = serverEvents.find((e) => e.id === ob.id);
-  if (!found) {
+  const board = serverEvents.find((e) => e.id === ob.id);
+  if (!board) {
+    clearOpenBoard();
+    return null;
+  }
+  const boardTs = new Date(board.event_at).getTime();
+  const hasLaterAlight = serverEvents.some((e) =>
+    e.event === 'alight' &&
+    e.direction === board.direction &&
+    e.local_date === board.local_date &&
+    new Date(e.event_at).getTime() > boardTs
+  );
+  if (hasLaterAlight) {
     clearOpenBoard();
     return null;
   }

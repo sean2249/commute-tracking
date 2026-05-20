@@ -65,6 +65,14 @@ async function handleEntry(btn) {
   const event = btn.dataset.event;
   const labelText = btn.querySelector('.label').textContent;
   btn.dataset.label = labelText;
+
+  // Notification.requestPermission() must be invoked synchronously inside the
+  // user-gesture click handler — Safari and some Android browsers ignore it
+  // if it lands after any awaited operation. Fire-and-forget.
+  if (event === 'board') {
+    ensureNotificationPermission().catch(() => {});
+  }
+
   setButtonsBusy();
   showLoading(btn);
   renderStrip({ state: 'locating' });
@@ -93,7 +101,7 @@ async function handleEntry(btn) {
 
   if (event === 'board') {
     setOpenBoard({ id: data.id, direction, event_at: data.logged_at });
-    ensureNotificationPermission().then(() => scheduleReminder()).catch(() => {});
+    scheduleReminder();
   } else {
     cancelReminder();
     clearOpenBoard();
@@ -272,20 +280,26 @@ async function refreshRecent() {
 }
 
 function renderPairRow(p) {
+  const primary = p.board || p.alight;
   const ref = p.alight || p.board;
   const wxUnavailable = isWeatherUnavailable(ref.weather);
   const tempStr = wxUnavailable || ref.temp_c == null ? '—°' : `${ref.temp_c}°`;
-  const boardTime = formatTime(p.board.local_time);
+  const boardTime = p.board ? formatTime(p.board.local_time) : '⋯';
   const alightTime = p.alight ? formatTime(p.alight.local_time) : '⋯';
-  const duration = p.durationMin != null
-    ? `<span class="duration mono">${p.durationMin}m</span>`
-    : '<span class="duration active">active</span>';
+  let duration;
+  if (p.durationMin != null) {
+    duration = `<span class="duration mono">${p.durationMin}m</span>`;
+  } else if (!p.alight) {
+    duration = '<span class="duration active">active</span>';
+  } else {
+    duration = '<span class="duration muted">—</span>';
+  }
   const trash = ICONS.trash ? ICONS.trash(16) : '×';
-  const aliasId = p.board.id;
+  const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
   return `
-    <li class="pair-row${p.alight ? '' : ' open'}">
+    <li class="pair-row${rowClass}">
       <span class="mono date">${formatDate(p.local_date)}</span>
-      <span class="wkday muted">${weekdayShort(p.board.weekday)}</span>
+      <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
       <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>
       <span class="dir-label">${DIRECTION_LABELS[p.direction] || ''}</span>
       <span class="trip mono">${boardTime} → ${alightTime}</span>
@@ -293,7 +307,7 @@ function renderPairRow(p) {
       <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(ref.weather)}</span>
       <span class="temp mono">${tempStr}</span>
       <button class="delete-btn" type="button"
-              data-board-id="${aliasId}"
+              data-board-id="${p.board ? p.board.id : ''}"
               data-alight-id="${p.alight ? p.alight.id : ''}"
               aria-label="刪除">${trash}</button>
     </li>
@@ -320,12 +334,16 @@ async function handlePairDelete(ev, btn) {
   btn.innerHTML = '<span>刪除中…</span>';
   const boardId = btn.dataset.boardId;
   const alightId = btn.dataset.alightId;
-  const ops = [deleteEvent(boardId)];
+  const ops = [];
+  if (boardId) ops.push(deleteEvent(boardId));
   if (alightId) ops.push(deleteEvent(alightId));
+  if (ops.length === 0) { await refreshRecent(); return; }
   const results = await Promise.all(ops);
   const failed = results.find((r) => r && r.error);
   if (failed) {
     showError(failed.error.message || '刪除失敗');
+    await refreshRecent();
+    return;
   }
   const ob = getOpenBoard();
   if (ob && (ob.id === boardId || ob.id === alightId)) {

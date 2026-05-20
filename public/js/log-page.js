@@ -51,8 +51,8 @@ function render() {
       return ref.weather === filters.weather;
     });
   }
-  if (filters.status === 'paired') pairs = pairs.filter((p) => !!p.alight);
-  if (filters.status === 'open') pairs = pairs.filter((p) => !p.alight);
+  if (filters.status === 'paired') pairs = pairs.filter((p) => p.board && p.alight);
+  if (filters.status === 'open') pairs = pairs.filter((p) => !p.alight || !p.board);
 
   if (pairs.length === 0) {
     listEl.innerHTML = `
@@ -71,19 +71,26 @@ function render() {
 }
 
 function renderPairRow(p) {
+  const primary = p.board || p.alight;
   const ref = p.alight || p.board;
   const wxUnavailable = isWeatherUnavailable(ref.weather);
   const tempStr = wxUnavailable || ref.temp_c == null ? '—°' : `${ref.temp_c}°`;
-  const boardTime = formatTime(p.board.local_time);
+  const boardTime = p.board ? formatTime(p.board.local_time) : '⋯';
   const alightTime = p.alight ? formatTime(p.alight.local_time) : '⋯';
-  const duration = p.durationMin != null
-    ? `<span class="duration mono">${p.durationMin}m</span>`
-    : '<span class="duration active">active</span>';
+  let duration;
+  if (p.durationMin != null) {
+    duration = `<span class="duration mono">${p.durationMin}m</span>`;
+  } else if (!p.alight) {
+    duration = '<span class="duration active">active</span>';
+  } else {
+    duration = '<span class="duration muted">—</span>';
+  }
   const trash = ICONS.trash ? ICONS.trash(16) : '×';
+  const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
   return `
-    <li class="pair-row${p.alight ? '' : ' open'}" id="row-${p.board.id}">
+    <li class="pair-row${rowClass}" id="row-${primary.id}">
       <span class="mono date">${formatDate(p.local_date)}</span>
-      <span class="wkday muted">${weekdayShort(p.board.weekday)}</span>
+      <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
       <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>
       <span class="dir-label">${DIRECTION_LABELS[p.direction] || ''}</span>
       <span class="trip mono">${boardTime} → ${alightTime}</span>
@@ -91,7 +98,7 @@ function renderPairRow(p) {
       <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(ref.weather)}</span>
       <span class="temp mono">${tempStr}</span>
       <button class="delete-btn" type="button"
-              data-board-id="${p.board.id}"
+              data-board-id="${p.board ? p.board.id : ''}"
               data-alight-id="${p.alight ? p.alight.id : ''}"
               aria-label="刪除">${trash}</button>
     </li>
@@ -118,12 +125,16 @@ async function handlePairDelete(ev, btn) {
   btn.innerHTML = '<span>刪除中…</span>';
   const boardId = btn.dataset.boardId;
   const alightId = btn.dataset.alightId;
-  const ops = [deleteEvent(boardId)];
+  const ops = [];
+  if (boardId) ops.push(deleteEvent(boardId));
   if (alightId) ops.push(deleteEvent(alightId));
+  if (ops.length === 0) { await load(); return; }
   const results = await Promise.all(ops);
   const failed = results.find((r) => r && r.error);
   if (failed) {
     showError(failed.error.message || '刪除失敗');
+    await load();
+    return;
   }
   allEvents = allEvents.filter((e) => e.id !== boardId && e.id !== alightId);
   render();

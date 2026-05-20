@@ -10,31 +10,39 @@ export function pairEvents(events) {
   const pairs = [];
   for (const arr of buckets.values()) {
     arr.sort((a, b) => new Date(a.event_at) - new Date(b.event_at));
-    const boards = arr.filter((e) => e.event === 'board');
-    const aligns = arr.filter((e) => e.event === 'alight');
-    const len = Math.max(boards.length, aligns.length);
-    for (let i = 0; i < len; i++) {
-      const board = boards[i] || null;
-      const alight = aligns[i] || null;
-      if (!board && !alight) continue;
-      if (!board) continue;
-      const durationMin = board && alight
-        ? Math.round((new Date(alight.event_at) - new Date(board.event_at)) / 60000)
-        : null;
+    const pendingBoards = [];
+    for (const e of arr) {
+      if (e.event === 'board') {
+        pendingBoards.push(e);
+      } else if (e.event === 'alight') {
+        const board = pendingBoards.shift() || null;
+        const durationMin = board
+          ? Math.round((new Date(e.event_at) - new Date(board.event_at)) / 60000)
+          : null;
+        pairs.push({
+          board,
+          alight: e,
+          direction: e.direction,
+          local_date: e.local_date,
+          durationMin,
+        });
+      }
+    }
+    for (const b of pendingBoards) {
       pairs.push({
-        board,
-        alight,
-        direction: board.direction,
-        local_date: board.local_date,
-        durationMin,
+        board: b,
+        alight: null,
+        direction: b.direction,
+        local_date: b.local_date,
+        durationMin: null,
       });
     }
   }
 
   pairs.sort((a, b) => {
-    const aTs = new Date((a.alight || a.board).event_at);
-    const bTs = new Date((b.alight || b.board).event_at);
-    return bTs - aTs;
+    const aRef = a.alight || a.board;
+    const bRef = b.alight || b.board;
+    return new Date(bRef.event_at) - new Date(aRef.event_at);
   });
   return pairs;
 }
@@ -42,7 +50,7 @@ export function pairEvents(events) {
 export function findOpenBoard(events) {
   const pairs = pairEvents(events);
   for (const p of pairs) {
-    if (!p.alight) return p.board;
+    if (p.board && !p.alight) return p.board;
   }
   return null;
 }

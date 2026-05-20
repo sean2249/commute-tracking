@@ -39,19 +39,31 @@ export async function ensureNotificationPermission() {
   }
 }
 
+async function getSwRegistration(timeoutMs = 2000) {
+  if (!('serviceWorker' in navigator)) return null;
+  try {
+    return await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('sw ready timeout')), timeoutMs)),
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 async function showReminderNotification(ob) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
   const title = '別忘了按下車';
   const body = ob.direction === 'to_work' ? '上班的「上車」已記錄 40 分鐘了。' : '下班的「上車」已記錄 40 分鐘了。';
   const opts = { body, tag: `commute-remind-${ob.id}`, renotify: true, badge: 'icons/icon-180.png', icon: 'icons/icon-180.png' };
-  try {
-    if ('serviceWorker' in navigator) {
-      const reg = await navigator.serviceWorker.ready;
+  const reg = await getSwRegistration();
+  if (reg) {
+    try {
       await reg.showNotification(title, opts);
       return true;
+    } catch {
+      // fall through
     }
-  } catch {
-    // fall through to direct Notification
   }
   try {
     new Notification(title, opts);
