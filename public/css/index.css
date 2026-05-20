@@ -16,6 +16,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--sp-2);
+  flex-wrap: wrap;
 }
 
 .status-strip .time {
@@ -91,6 +92,8 @@
   color: var(--fg);
   transition: opacity var(--motion-base) var(--ease-out), background var(--motion-fast) var(--ease-out);
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .status-strip .retry-pill[disabled] { opacity: 0.5; pointer-events: none; }
 .status-strip .retry-pill:active { background: var(--surface-press); }
@@ -232,6 +235,27 @@
 }
 .recent-list .delete-btn[disabled] { opacity: 0.5; pointer-events: none; }
 .recent-list .empty { color: var(--fg-muted); padding: var(--sp-3); text-align: center; list-style: none; }
+
+@media (max-width: 480px) {
+  .recent-list .pair-row {
+    grid-template-columns: auto auto auto auto 1fr auto;
+    grid-template-areas:
+      "date wkday dir label duration delete"
+      "trip trip trip wx temp delete";
+    column-gap: var(--sp-2);
+    row-gap: 2px;
+    padding: var(--sp-2) 0;
+  }
+  .recent-list .pair-row > .date { grid-area: date; }
+  .recent-list .pair-row > .wkday { grid-area: wkday; }
+  .recent-list .pair-row > .dir { grid-area: dir; }
+  .recent-list .pair-row > .dir-label { grid-area: label; }
+  .recent-list .pair-row > .trip { grid-area: trip; }
+  .recent-list .pair-row > .duration { grid-area: duration; text-align: right; }
+  .recent-list .pair-row > .wx { grid-area: wx; justify-self: end; }
+  .recent-list .pair-row > .temp { grid-area: temp; text-align: right; }
+  .recent-list .pair-row > .delete-btn { grid-area: delete; align-self: center; }
+}
 
 @media (min-width: 720px) {
   .entry-buttons {
