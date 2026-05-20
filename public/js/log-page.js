@@ -141,7 +141,7 @@ async function handlePairDelete(ev, btn) {
 }
 
 function skeletonRows(n) {
-  return Array.from({ length: n }).map(() => '<li class="pair-row"><div class="skeleton" style="height: 32px; margin: 4px;"></div></li>').join('');
+  return Array.from({ length: n }).map(() => '<li class="pair-row skeleton-row"><div class="skeleton" style="height: 32px; margin: 4px; grid-column: 1 / -1;"></div></li>').join('');
 }
 
 function showError(msg) {

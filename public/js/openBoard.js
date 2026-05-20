@@ -13,16 +13,24 @@ export function getOpenBoard() {
 }
 
 export function setOpenBoard(ob) {
-  localStorage.setItem(KEY, JSON.stringify({
-    id: ob.id,
-    direction: ob.direction,
-    event_at: ob.event_at,
-    notifiedAt: ob.notifiedAt ?? null,
-  }));
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      id: ob.id,
+      direction: ob.direction,
+      event_at: ob.event_at,
+      notifiedAt: ob.notifiedAt ?? null,
+    }));
+  } catch (err) {
+    console.warn('[openBoard] localStorage write failed', err);
+  }
 }
 
 export function clearOpenBoard() {
-  localStorage.removeItem(KEY);
+  try {
+    localStorage.removeItem(KEY);
+  } catch (err) {
+    console.warn('[openBoard] localStorage remove failed', err);
+  }
 }
 
 export function markNotified() {
