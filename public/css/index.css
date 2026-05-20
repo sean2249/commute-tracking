@@ -72,28 +72,29 @@
 
 .status-strip .weather.unavailable .icon { opacity: 0.5; color: var(--fg-subtle); }
 
-.status-strip .undo-pill {
-  position: absolute;
-  top: var(--sp-3);
-  right: var(--sp-3);
+.status-strip .weather .reason {
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+  font-family: var(--font-prose);
+}
+
+.status-strip .retry-pill {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-1);
-  font-family: var(--font-mono);
   font-size: var(--fs-sm);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-full);
-  padding: 6px 12px;
-  min-height: 32px;
+  padding: 4px 10px;
+  min-height: 28px;
   background: var(--bg-elevated);
-  transition: opacity var(--motion-base) var(--ease-out);
+  color: var(--fg);
+  transition: opacity var(--motion-base) var(--ease-out), background var(--motion-fast) var(--ease-out);
+  margin-left: auto;
 }
-
-.status-strip .undo-pill[disabled] { opacity: 0.4; pointer-events: none; }
-.status-strip .undo-pill:active { background: var(--surface-press); }
-
-.status-strip[data-state="idle"] .undo-pill,
-.status-strip[data-state="empty"] .undo-pill { display: none; }
+.status-strip .retry-pill[disabled] { opacity: 0.5; pointer-events: none; }
+.status-strip .retry-pill:active { background: var(--surface-press); }
+.status-strip .retry-pill .icon-sm { display: inline-flex; align-items: center; }
 
 .status-strip[data-state="empty"] {
   align-items: center;
@@ -111,6 +112,9 @@
   gap: var(--sp-3);
   margin-bottom: var(--sp-6);
 }
+
+.entry-button[hidden] { display: none; }
+.entry-buttons:has(.entry-button[hidden]) { grid-template-columns: 1fr; }
 
 .entry-button {
   min-height: 96px;
@@ -182,26 +186,52 @@
   padding: 0;
 }
 
-.recent-list li a {
+.recent-list .pair-row {
   display: grid;
-  grid-template-columns: 64px 56px 36px 20px 64px 28px 1fr;
+  grid-template-columns: 52px 32px 14px 36px 1fr 44px 24px 36px 28px;
   gap: var(--sp-2);
   align-items: center;
-  min-height: 36px;
+  min-height: 40px;
   padding: var(--sp-2) var(--sp-1);
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-sm);
 }
 
-.recent-list li a:active { background: var(--surface-press); }
-.recent-list li:last-child a { border-bottom: 0; }
+.recent-list .pair-row:last-child { border-bottom: 0; }
+.recent-list .pair-row.open { background: linear-gradient(90deg, var(--accent-bg-soft, transparent) 0%, transparent 60%); }
 
 .recent-list .mono { font-feature-settings: "tnum" 1; }
 .recent-list .dir { color: var(--accent); text-align: center; font-weight: 600; }
+.recent-list .dir-label { font-weight: 500; }
+.recent-list .trip { font-family: var(--font-mono); }
+.recent-list .duration { font-size: var(--fs-xs); color: var(--fg-muted); text-align: right; }
+.recent-list .duration.active { color: var(--accent); font-weight: 600; font-family: var(--font-prose); }
 .recent-list .wx { color: var(--fg-muted); display: inline-flex; align-items: center; justify-content: center; }
 .recent-list .wx.unavailable { color: var(--fg-subtle); opacity: 0.5; }
 .recent-list .temp { font-family: var(--font-mono); font-feature-settings: "tnum" 1; text-align: right; }
-.recent-list .empty { color: var(--fg-muted); padding: var(--sp-3); text-align: center; }
+.recent-list .delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--fg-muted);
+  transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+}
+.recent-list .delete-btn:active { background: var(--surface-press); }
+.recent-list .delete-btn.confirm {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger);
+  width: auto;
+  padding: 0 var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.recent-list .delete-btn[disabled] { opacity: 0.5; pointer-events: none; }
+.recent-list .empty { color: var(--fg-muted); padding: var(--sp-3); text-align: center; list-style: none; }
 
 @media (min-width: 720px) {
   .entry-buttons {

@@ -23,9 +23,9 @@
 
   <div id="filter-chips" class="filter-chips">
     <div class="filter-group">
-      <button class="chip" type="button" data-group="event" data-value="" aria-pressed="true">All</button>
-      <button class="chip" type="button" data-group="event" data-value="board" aria-pressed="false">Board</button>
-      <button class="chip" type="button" data-group="event" data-value="alight" aria-pressed="false">Alight</button>
+      <button class="chip" type="button" data-group="status" data-value="" aria-pressed="true">All</button>
+      <button class="chip" type="button" data-group="status" data-value="paired" aria-pressed="false">Paired</button>
+      <button class="chip" type="button" data-group="status" data-value="open" aria-pressed="false">Open</button>
     </div>
     <div class="filter-group">
       <button class="chip" type="button" data-group="direction" data-value="to_work" aria-pressed="false">↑ Work</button>
@@ -40,13 +40,14 @@
 
   <div class="log-header">
     <span>Date</span>
-    <span>Time</span>
     <span>Wk</span>
     <span>Dir</span>
-    <span>Event</span>
+    <span>Label</span>
+    <span>Trip</span>
+    <span>Dur</span>
     <span>Wx</span>
     <span>Temp</span>
-    <span>Note</span>
+    <span></span>
   </div>
   <ul id="log-list" class="log-list">
     <li class="log-row"><div class="skeleton" style="height:32px;margin:4px"></div></li>

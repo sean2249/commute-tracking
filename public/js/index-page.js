@@ -1,7 +1,10 @@
-import { logEvent, listEvents, deleteEvent } from './api.js';
-import { locateAndFetchWeather } from './weather.js';
-import { formatTime, formatDate, weekdayShort, addMinutes, minutesBetween } from './time.js';
+import { logEvent, listEvents, deleteEvent, updateWeather } from './api.js';
+import { locateAndFetchWeather, WEATHER_REASON_LABELS } from './weather.js';
+import { formatTime, formatDate, weekdayShort, addMinutes } from './time.js';
 import { weatherIcon, isWeatherUnavailable, ICONS } from './icons.js';
+import { pairEvents } from './pair.js';
+import { getOpenBoard, setOpenBoard, clearOpenBoard, reconcileWithServer } from './openBoard.js';
+import { init as initReminder, cancel as cancelReminder, schedule as scheduleReminder, ensureNotificationPermission } from './reminder.js';
 
 const strip = document.getElementById('status-strip');
 const recentList = document.getElementById('recent-list');
@@ -12,7 +15,8 @@ const EVENT_LABELS = { board: '上車', alight: '下車' };
 const DIRECTION_ARROWS = { to_work: '↑', from_work: '↓' };
 
 let recentCache = [];
-let undoCountdownId = null;
+let latestEvent = null;
+let latestWeatherReason = null;
 
 document.querySelectorAll('[data-icon]').forEach((el) => {
   const name = el.dataset.icon;
@@ -23,16 +27,25 @@ buttons.forEach((btn) => {
   btn.addEventListener('click', () => handleEntry(btn));
 });
 
-function setButtonsState(state) {
+function applyGating() {
+  const ob = getOpenBoard();
   buttons.forEach((b) => {
-    if (state === 'idle') {
-      b.dataset.state = '';
-      b.removeAttribute('disabled');
-      b.querySelector('.label').textContent = b.dataset.label;
-    } else {
-      b.setAttribute('disabled', '');
-    }
+    const matchAlight = ob && b.dataset.direction === ob.direction && b.dataset.event === 'alight';
+    b.hidden = ob ? !matchAlight : false;
   });
+}
+
+function setButtonsBusy() {
+  buttons.forEach((b) => b.setAttribute('disabled', ''));
+}
+
+function setButtonsIdle() {
+  buttons.forEach((b) => {
+    b.dataset.state = '';
+    b.removeAttribute('disabled');
+    if (b.dataset.label) b.querySelector('.label').textContent = b.dataset.label;
+  });
+  applyGating();
 }
 
 function showLoading(btn) {
@@ -52,11 +65,20 @@ async function handleEntry(btn) {
   const event = btn.dataset.event;
   const labelText = btn.querySelector('.label').textContent;
   btn.dataset.label = labelText;
-  setButtonsState('busy');
+
+  // Notification.requestPermission() must be invoked synchronously inside the
+  // user-gesture click handler — Safari and some Android browsers ignore it
+  // if it lands after any awaited operation. Fire-and-forget.
+  if (event === 'board') {
+    ensureNotificationPermission().catch(() => {});
+  }
+
+  setButtonsBusy();
   showLoading(btn);
   renderStrip({ state: 'locating' });
 
   const geo = await locateAndFetchWeather();
+  latestWeatherReason = geo.reason;
 
   const { data, error } = await logEvent({
     direction, event,
@@ -71,15 +93,31 @@ async function handleEntry(btn) {
     btn.classList.add('shake');
     setTimeout(() => btn.classList.remove('shake'), 240);
     btn.querySelector('.label').textContent = btn.dataset.label;
-    setButtonsState('idle');
+    setButtonsIdle();
     showError(error.message || '送出失敗');
     renderStrip({ state: 'error' });
     return;
   }
 
-  flashState(btn, 'success');
+  if (event === 'board') {
+    setOpenBoard({ id: data.id, direction, event_at: data.logged_at });
+    scheduleReminder();
+  } else {
+    cancelReminder();
+    clearOpenBoard();
+  }
+
   btn.querySelector('.label').textContent = btn.dataset.label;
-  setButtonsState('idle');
+  setButtonsIdle();
+  if (!btn.hidden) flashState(btn, 'success');
+
+  latestEvent = {
+    id: data.id,
+    direction, event,
+    local_time: data.local_time,
+    weather: geo.weather,
+    temp_c: geo.temp_c,
+  };
 
   renderStrip({
     state: 'success',
@@ -110,7 +148,7 @@ function renderStrip(payload) {
   }
   if (payload.state === 'error') {
     strip.dataset.state = 'error';
-    strip.innerHTML = '<div class="row muted">紀錄失敗，請重試</div>';
+    strip.innerHTML = '<div class="row muted">紀錄失敗,請重試</div>';
     return;
   }
   if (payload.state === 'empty') {
@@ -126,21 +164,23 @@ function renderStrip(payload) {
 
   let etaRow;
   if (r.event === 'alight') {
-    const earlierBoard = recentCache.find(
-      (e) => e.direction === r.direction && e.event === 'board' && e.local_date === todayLocal()
-    );
-    if (earlierBoard) {
-      const min = minutesBetween(formatTime(earlierBoard.local_time), r.time);
-      etaRow = `<div class="eta">耗時 ${min} <span class="small">min</span></div>`;
-    } else {
-      etaRow = '';
-    }
+    etaRow = '';
   } else if (r.prediction) {
     const { eta, swing } = buildEtaText(r.time, r.prediction);
     etaRow = `<div class="eta">ETA ${eta} <span class="small">· n=${r.prediction.n} · ±${swing}min</span></div>`;
   } else {
     etaRow = '<div class="row"><span class="pred-pending">ETA 累積中</span></div>';
   }
+
+  const reasonText = wxUnavailable && latestWeatherReason && latestWeatherReason !== 'ok'
+    ? WEATHER_REASON_LABELS[latestWeatherReason] || '天氣資料不可用'
+    : '';
+  const retryPill = wxUnavailable
+    ? `<button class="retry-pill" id="retry-weather" type="button">
+         <span class="icon-sm">${ICONS.refresh ? ICONS.refresh(14) : '↻'}</span>
+         <span>重抓天氣</span>
+       </button>`
+    : '';
 
   strip.dataset.state = 'success';
   strip.innerHTML = `
@@ -152,74 +192,165 @@ function renderStrip(payload) {
     <div class="row weather${wxUnavailable ? ' unavailable' : ''}">
       <span class="icon">${weatherIcon(r.weather)}</span>
       <span class="temp">${tempStr}</span>
+      ${reasonText ? `<span class="reason muted">${reasonText}</span>` : ''}
+      ${retryPill}
     </div>
-    <button class="undo-pill" id="undo-btn" type="button">
-      <span class="icon-sm">${ICONS.undo(14)}</span>
-      <span>Undo (<span id="undo-count">10</span>)</span>
-    </button>
   `;
-  startUndoCountdown(r.id);
+
+  const retryBtn = document.getElementById('retry-weather');
+  if (retryBtn) retryBtn.addEventListener('click', () => retryWeather(r.id));
 }
 
-function startUndoCountdown(eventId) {
-  if (undoCountdownId) clearInterval(undoCountdownId);
-  const btn = document.getElementById('undo-btn');
-  const counter = document.getElementById('undo-count');
-  if (!btn || !counter) return;
-  let seconds = 10;
-  counter.textContent = seconds;
-  btn.addEventListener('click', async () => {
-    btn.setAttribute('disabled', '');
-    await deleteEvent(eventId);
-    clearInterval(undoCountdownId);
-    renderStrip({ state: 'empty' });
-    await refreshRecent();
-  });
-  undoCountdownId = setInterval(() => {
-    seconds -= 1;
-    if (seconds <= 0) {
-      clearInterval(undoCountdownId);
-      btn.style.opacity = '0';
-      setTimeout(() => btn.remove(), 250);
-      return;
+async function retryWeather(eventId) {
+  const btn = document.getElementById('retry-weather');
+  if (btn) { btn.setAttribute('disabled', ''); btn.querySelector('span:last-child').textContent = '重抓中…'; }
+  const geo = await locateAndFetchWeather();
+  latestWeatherReason = geo.reason;
+  if (geo.reason !== 'ok') {
+    if (btn) { btn.removeAttribute('disabled'); btn.querySelector('span:last-child').textContent = '重抓天氣'; }
+    if (latestEvent && latestEvent.id === eventId) {
+      renderStrip({
+        state: 'success',
+        record: {
+          id: latestEvent.id,
+          direction: latestEvent.direction,
+          event: latestEvent.event,
+          time: formatTime(latestEvent.local_time),
+          weather: latestEvent.weather,
+          temp_c: latestEvent.temp_c,
+          prediction: null,
+        },
+      });
     }
-    counter.textContent = seconds;
-  }, 1000);
-}
-
-function todayLocal() {
-  const d = new Date();
-  return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+    showError(WEATHER_REASON_LABELS[geo.reason] || '天氣重抓失敗');
+    return;
+  }
+  const { error } = await updateWeather(eventId, geo);
+  if (error) {
+    if (btn) { btn.removeAttribute('disabled'); btn.querySelector('span:last-child').textContent = '重抓天氣'; }
+    showError(error.message || '更新失敗');
+    return;
+  }
+  if (latestEvent && latestEvent.id === eventId) {
+    latestEvent.weather = geo.weather;
+    latestEvent.temp_c = geo.temp_c;
+  }
+  if (latestEvent) {
+    renderStrip({
+      state: 'success',
+      record: {
+        id: latestEvent.id,
+        direction: latestEvent.direction,
+        event: latestEvent.event,
+        time: formatTime(latestEvent.local_time),
+        weather: geo.weather,
+        temp_c: geo.temp_c,
+        prediction: null,
+      },
+    });
+  }
+  await refreshRecent();
 }
 
 async function refreshRecent() {
   const { data, error } = await listEvents(20);
   if (error) {
-    recentList.innerHTML = `<li class="empty">無法載入紀錄：${escapeHtml(error.message)}</li>`;
+    recentList.innerHTML = `<li class="empty">無法載入紀錄:${escapeHtml(error.message)}</li>`;
     return;
   }
   recentCache = data || [];
+  reconcileWithServer(recentCache);
+  applyGating();
+
   if (recentCache.length === 0) {
     recentList.innerHTML = '<li class="empty">尚無紀錄。</li>';
     return;
   }
-  const top = recentCache.slice(0, 5);
-  recentList.innerHTML = top.map((e) => {
-    const wxUnavailable = isWeatherUnavailable(e.weather);
-    return `
-      <li>
-        <a href="log.html#${e.id}">
-          <span class="mono date">${formatDate(e.local_date)}</span>
-          <span class="mono time">${formatTime(e.local_time)}</span>
-          <span class="wkday muted">${weekdayShort(e.weekday)}</span>
-          <span class="dir">${DIRECTION_ARROWS[e.direction] || ''}</span>
-          <span class="event">${EVENT_LABELS[e.event] || e.event}</span>
-          <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(e.weather)}</span>
-          <span class="temp">${wxUnavailable || e.temp_c == null ? '—°' : e.temp_c + '°'}</span>
-        </a>
-      </li>
-    `;
-  }).join('');
+
+  const pairs = pairEvents(recentCache).slice(0, 5);
+  if (pairs.length === 0) {
+    recentList.innerHTML = '<li class="empty">尚無紀錄。</li>';
+    return;
+  }
+
+  recentList.innerHTML = pairs.map(renderPairRow).join('');
+  recentList.querySelectorAll('.delete-btn').forEach((b) => {
+    b.addEventListener('click', (e) => handlePairDelete(e, b));
+  });
+}
+
+function renderPairRow(p) {
+  const primary = p.board || p.alight;
+  const ref = p.alight || p.board;
+  const wxUnavailable = isWeatherUnavailable(ref.weather);
+  const tempStr = wxUnavailable || ref.temp_c == null ? '—°' : `${ref.temp_c}°`;
+  const boardTime = p.board ? formatTime(p.board.local_time) : '⋯';
+  const alightTime = p.alight ? formatTime(p.alight.local_time) : '⋯';
+  let duration;
+  if (p.durationMin != null) {
+    duration = `<span class="duration mono">${p.durationMin}m</span>`;
+  } else if (!p.alight) {
+    duration = '<span class="duration active">active</span>';
+  } else {
+    duration = '<span class="duration muted">—</span>';
+  }
+  const trash = ICONS.trash ? ICONS.trash(16) : '×';
+  const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
+  return `
+    <li class="pair-row${rowClass}">
+      <span class="mono date">${formatDate(p.local_date)}</span>
+      <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
+      <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>
+      <span class="dir-label">${DIRECTION_LABELS[p.direction] || ''}</span>
+      <span class="trip mono">${boardTime} → ${alightTime}</span>
+      ${duration}
+      <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(ref.weather)}</span>
+      <span class="temp mono">${tempStr}</span>
+      <button class="delete-btn" type="button"
+              data-board-id="${p.board ? p.board.id : ''}"
+              data-alight-id="${p.alight ? p.alight.id : ''}"
+              aria-label="刪除">${trash}</button>
+    </li>
+  `;
+}
+
+async function handlePairDelete(ev, btn) {
+  ev.stopPropagation();
+  if (btn.dataset.confirm !== '1') {
+    btn.dataset.confirm = '1';
+    btn.classList.add('confirm');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span>確定?</span>';
+    setTimeout(() => {
+      if (btn.dataset.confirm === '1') {
+        btn.dataset.confirm = '';
+        btn.classList.remove('confirm');
+        btn.innerHTML = orig;
+      }
+    }, 3000);
+    return;
+  }
+  btn.setAttribute('disabled', '');
+  btn.innerHTML = '<span>刪除中…</span>';
+  const boardId = btn.dataset.boardId;
+  const alightId = btn.dataset.alightId;
+  const ops = [];
+  if (boardId) ops.push(deleteEvent(boardId));
+  if (alightId) ops.push(deleteEvent(alightId));
+  if (ops.length === 0) { await refreshRecent(); return; }
+  const results = await Promise.all(ops);
+  const failed = results.find((r) => r && r.error);
+  if (failed) {
+    showError(failed.error.message || '刪除失敗');
+    await refreshRecent();
+    return;
+  }
+  const ob = getOpenBoard();
+  if (ob && (ob.id === boardId || ob.id === alightId)) {
+    cancelReminder();
+    clearOpenBoard();
+  }
+  await refreshRecent();
 }
 
 function showError(msg) {
@@ -236,5 +367,15 @@ function escapeHtml(s) {
   }[c]));
 }
 
+window.addEventListener('reminder:auto-discard', () => {
+  refreshRecent();
+});
+
 renderStrip({ state: 'empty' });
+applyGating();
+initReminder({
+  onAutoDiscard: () => {
+    refreshRecent();
+  },
+});
 refreshRecent();
