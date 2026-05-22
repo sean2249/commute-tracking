@@ -25,18 +25,25 @@
   </section>
 
   <div class="entry-buttons">
-    <button class="entry-button" type="button" data-direction="to_work" data-event="board">
-      <span class="label">上班 · 上車</span>
+    <button class="primary-action" id="primary-action" type="button" aria-live="polite">
+      <span class="primary-action__stub" aria-hidden="true">
+        <span class="primary-action__stub-direction"></span>
+        <span class="primary-action__icon"></span>
+        <span class="primary-action__serial"></span>
+      </span>
+      <span class="primary-action__main">
+        <span class="primary-action__header" aria-hidden="true">
+          <span class="primary-action__brand">PASS · 通勤券</span>
+          <span class="primary-action__class">ONE WAY</span>
+        </span>
+        <span class="primary-action__label"></span>
+        <span class="primary-action__footer" aria-hidden="true">
+          <span class="primary-action__route"></span>
+          <span class="primary-action__date"></span>
+        </span>
+      </span>
     </button>
-    <button class="entry-button" type="button" data-direction="to_work" data-event="alight">
-      <span class="label">上班 · 下車</span>
-    </button>
-    <button class="entry-button" type="button" data-direction="from_work" data-event="board">
-      <span class="label">下班 · 上車</span>
-    </button>
-    <button class="entry-button" type="button" data-direction="from_work" data-event="alight">
-      <span class="label">下班 · 下車</span>
-    </button>
+    <p class="primary-action__hint" id="primary-action-hint"></p>
   </div>
 
   <section class="recent-section">
