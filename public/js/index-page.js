@@ -1,6 +1,6 @@
 import { logEvent, listEvents, deleteEvent, updateWeather } from './api.js';
 import { locateAndFetchWeather, WEATHER_REASON_LABELS } from './weather.js';
-import { formatTime, formatDate, weekdayShort, addMinutes } from './time.js';
+import { formatTime, formatDate, weekdayShort, addMinutes, inferDirectionByTime } from './time.js';
 import { weatherIcon, isWeatherUnavailable, ICONS } from './icons.js';
 import { pairEvents } from './pair.js';
 import { getOpenBoard, setOpenBoard, clearOpenBoard, reconcileWithServer } from './openBoard.js';
@@ -8,63 +8,136 @@ import { init as initReminder, cancel as cancelReminder, schedule as scheduleRem
 
 const strip = document.getElementById('status-strip');
 const recentList = document.getElementById('recent-list');
-const buttons = document.querySelectorAll('.entry-button');
+const primaryBtn = document.getElementById('primary-action');
+const primaryHint = document.getElementById('primary-action-hint');
 
 const DIRECTION_LABELS = { to_work: '上班', from_work: '下班' };
 const EVENT_LABELS = { board: '上車', alight: '下車' };
 const DIRECTION_ARROWS = { to_work: '↑', from_work: '↓' };
+const LONG_PRESS_MS = 500;
 
 let recentCache = [];
 let latestEvent = null;
 let latestWeatherReason = null;
+let directionOverride = null;
+let actionInFlight = false;
+let longPressTimer = null;
+let longPressFired = false;
 
 document.querySelectorAll('[data-icon]').forEach((el) => {
   const name = el.dataset.icon;
   if (ICONS[name]) el.innerHTML = ICONS[name](Number(el.dataset.size) || 20);
 });
 
-buttons.forEach((btn) => {
-  btn.addEventListener('click', () => handleEntry(btn));
-});
+function currentBoardDirection() {
+  return directionOverride || inferDirectionByTime();
+}
 
-function applyGating() {
+function renderPrimaryAction() {
   const ob = getOpenBoard();
-  buttons.forEach((b) => {
-    const matchAlight = ob && b.dataset.direction === ob.direction && b.dataset.event === 'alight';
-    b.hidden = ob ? !matchAlight : false;
-  });
+  const event = ob ? 'alight' : 'board';
+  const direction = ob ? ob.direction : currentBoardDirection();
+  const colorVariant = direction === 'from_work' ? 'cool' : 'warm';
+  const labelText = EVENT_LABELS[event];
+  const iconName = event === 'board' ? 'arrowUp' : 'arrowDown';
+
+  primaryBtn.dataset.event = event;
+  primaryBtn.dataset.direction = direction;
+  primaryBtn.dataset.color = colorVariant;
+  primaryBtn.setAttribute(
+    'aria-label',
+    `${DIRECTION_LABELS[direction]} · ${labelText}`,
+  );
+
+  const iconEl = primaryBtn.querySelector('.primary-action__icon');
+  const labelEl = primaryBtn.querySelector('.primary-action__label');
+  iconEl.innerHTML = ICONS[iconName](56);
+  labelEl.textContent = labelText;
+
+  if (event === 'board') {
+    const other = direction === 'to_work' ? '下班' : '上班';
+    primaryHint.textContent = `長按可切換為${other}方向`;
+  } else {
+    primaryHint.textContent = `寫入後會自動帶入「${DIRECTION_LABELS[direction]}」方向`;
+  }
 }
 
-function setButtonsBusy() {
-  buttons.forEach((b) => b.setAttribute('disabled', ''));
+function setBusy() {
+  actionInFlight = true;
+  primaryBtn.setAttribute('disabled', '');
 }
 
-function setButtonsIdle() {
-  buttons.forEach((b) => {
-    b.dataset.state = '';
-    b.removeAttribute('disabled');
-    if (b.dataset.label) b.querySelector('.label').textContent = b.dataset.label;
-  });
-  applyGating();
+function setIdle() {
+  actionInFlight = false;
+  primaryBtn.dataset.state = '';
+  primaryBtn.removeAttribute('disabled');
+  renderPrimaryAction();
 }
 
-function showLoading(btn) {
-  btn.dataset.state = 'loading';
-  btn.querySelector('.label').innerHTML = '<span class="spinner" aria-label="loading"></span>';
+function showLoading() {
+  primaryBtn.dataset.state = 'loading';
+  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="spinner" aria-label="loading"></span>';
+  primaryBtn.querySelector('.primary-action__label').textContent = '';
 }
 
-function flashState(btn, state) {
-  btn.dataset.state = state;
+function flashState(state) {
+  primaryBtn.dataset.state = state;
   setTimeout(() => {
-    if (btn.dataset.state === state) btn.dataset.state = '';
+    if (primaryBtn.dataset.state === state) primaryBtn.dataset.state = '';
   }, 400);
 }
 
-async function handleEntry(btn) {
-  const direction = btn.dataset.direction;
-  const event = btn.dataset.event;
-  const labelText = btn.querySelector('.label').textContent;
-  btn.dataset.label = labelText;
+function clearLongPressTimer() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
+
+function onPrimaryPointerDown(ev) {
+  if (actionInFlight) return;
+  // Long-press only applies to the board action; alight direction is fixed by open board.
+  if (primaryBtn.dataset.event !== 'board') return;
+  // Only respond to primary pointer button.
+  if (ev.button !== undefined && ev.button !== 0) return;
+  longPressFired = false;
+  clearLongPressTimer();
+  longPressTimer = setTimeout(() => {
+    longPressFired = true;
+    const inferred = inferDirectionByTime();
+    directionOverride = directionOverride
+      ? null
+      : (inferred === 'to_work' ? 'from_work' : 'to_work');
+    renderPrimaryAction();
+    if (navigator.vibrate) {
+      try { navigator.vibrate(30); } catch {}
+    }
+  }, LONG_PRESS_MS);
+}
+
+function onPrimaryPointerEnd() {
+  clearLongPressTimer();
+}
+
+function onPrimaryClick(ev) {
+  if (longPressFired) {
+    longPressFired = false;
+    ev.preventDefault();
+    return;
+  }
+  handlePrimary();
+}
+
+primaryBtn.addEventListener('pointerdown', onPrimaryPointerDown);
+primaryBtn.addEventListener('pointerup', onPrimaryPointerEnd);
+primaryBtn.addEventListener('pointercancel', onPrimaryPointerEnd);
+primaryBtn.addEventListener('pointerleave', onPrimaryPointerEnd);
+primaryBtn.addEventListener('click', onPrimaryClick);
+
+async function handlePrimary() {
+  if (actionInFlight) return;
+  const event = primaryBtn.dataset.event;
+  const direction = primaryBtn.dataset.direction;
 
   // Notification.requestPermission() AND PushManager.subscribe() must be
   // invoked synchronously inside the user-gesture click handler — Safari/iOS
@@ -79,8 +152,8 @@ async function handleEntry(btn) {
       .catch(() => {});
   }
 
-  setButtonsBusy();
-  showLoading(btn);
+  setBusy();
+  showLoading();
   renderStrip({ state: 'locating' });
 
   const geo = await locateAndFetchWeather();
@@ -95,11 +168,10 @@ async function handleEntry(btn) {
   });
 
   if (error) {
-    flashState(btn, 'error');
-    btn.classList.add('shake');
-    setTimeout(() => btn.classList.remove('shake'), 240);
-    btn.querySelector('.label').textContent = btn.dataset.label;
-    setButtonsIdle();
+    primaryBtn.classList.add('shake');
+    setTimeout(() => primaryBtn.classList.remove('shake'), 240);
+    flashState('error');
+    setIdle();
     showError(error.message || '送出失敗');
     renderStrip({ state: 'error' });
     return;
@@ -113,9 +185,9 @@ async function handleEntry(btn) {
     clearOpenBoard();
   }
 
-  btn.querySelector('.label').textContent = btn.dataset.label;
-  setButtonsIdle();
-  if (!btn.hidden) flashState(btn, 'success');
+  directionOverride = null;
+  setIdle();
+  flashState('success');
 
   latestEvent = {
     id: data.id,
@@ -149,17 +221,36 @@ function buildEtaText(time, pred) {
 function renderStrip(payload) {
   if (payload.state === 'locating') {
     strip.dataset.state = 'locating';
+    delete strip.dataset.direction;
     strip.innerHTML = '<div class="row muted">Locating…</div>';
     return;
   }
   if (payload.state === 'error') {
     strip.dataset.state = 'error';
+    delete strip.dataset.direction;
     strip.innerHTML = '<div class="row muted">紀錄失敗,請重試</div>';
     return;
   }
   if (payload.state === 'empty') {
     strip.dataset.state = 'empty';
-    strip.innerHTML = '<div>尚無紀錄。按下方任一按鈕開始。</div>';
+    delete strip.dataset.direction;
+    strip.innerHTML = '<div>尚無紀錄。按下方上車鍵開始。</div>';
+    return;
+  }
+  if (payload.state === 'tracking') {
+    const ob = payload.openBoard;
+    strip.dataset.state = 'tracking';
+    strip.dataset.direction = ob.direction;
+    const dirLabel = DIRECTION_LABELS[ob.direction];
+    const startedAt = formatTime(new Date(ob.event_at));
+    const minsAgo = Math.max(0, Math.round((Date.now() - new Date(ob.event_at).getTime()) / 60000));
+    strip.innerHTML = `
+      <div class="row">
+        <span class="time">${startedAt}</span>
+        <span class="label">${dirLabel} · 上車</span>
+      </div>
+      <div class="row muted"><span class="small">追蹤中 · ${minsAgo} 分鐘前</span></div>
+    `;
     return;
   }
 
@@ -189,6 +280,7 @@ function renderStrip(payload) {
     : '';
 
   strip.dataset.state = 'success';
+  strip.dataset.direction = r.direction;
   strip.innerHTML = `
     <div class="row">
       <span class="time">${r.time}</span>
@@ -266,7 +358,13 @@ async function refreshRecent() {
   }
   recentCache = data || [];
   reconcileWithServer(recentCache);
-  applyGating();
+  renderPrimaryAction();
+  // If an open board exists and the user hasn't just logged a new event,
+  // surface it in the status strip so they can see what's being tracked.
+  const ob = getOpenBoard();
+  if (ob && (!latestEvent || latestEvent.id !== ob.id)) {
+    renderStrip({ state: 'tracking', openBoard: ob });
+  }
 
   if (recentCache.length === 0) {
     recentList.innerHTML = '<li class="empty">尚無紀錄。</li>';
@@ -377,8 +475,13 @@ window.addEventListener('reminder:auto-discard', () => {
   refreshRecent();
 });
 
-renderStrip({ state: 'empty' });
-applyGating();
+const initialOb = getOpenBoard();
+if (initialOb) {
+  renderStrip({ state: 'tracking', openBoard: initialOb });
+} else {
+  renderStrip({ state: 'empty' });
+}
+renderPrimaryAction();
 initReminder({
   onAutoDiscard: () => {
     refreshRecent();

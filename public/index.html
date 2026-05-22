@@ -25,18 +25,11 @@
   </section>
 
   <div class="entry-buttons">
-    <button class="entry-button" type="button" data-direction="to_work" data-event="board">
-      <span class="label">上班 · 上車</span>
+    <button class="primary-action" id="primary-action" type="button" aria-live="polite">
+      <span class="primary-action__icon" aria-hidden="true"></span>
+      <span class="primary-action__label"></span>
     </button>
-    <button class="entry-button" type="button" data-direction="to_work" data-event="alight">
-      <span class="label">上班 · 下車</span>
-    </button>
-    <button class="entry-button" type="button" data-direction="from_work" data-event="board">
-      <span class="label">下班 · 上車</span>
-    </button>
-    <button class="entry-button" type="button" data-direction="from_work" data-event="alight">
-      <span class="label">下班 · 下車</span>
-    </button>
+    <p class="primary-action__hint" id="primary-action-hint"></p>
   </div>
 
   <section class="recent-section">

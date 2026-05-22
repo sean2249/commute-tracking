@@ -39,6 +39,12 @@ export function addMinutes(timeStr, minutes) {
   return `${hh}:${mm}`;
 }
 
+export function inferDirectionByTime(date = new Date()) {
+  const hourStr = date.toLocaleString('en-GB', { hour: '2-digit', hour12: false, timeZone: TZ });
+  const hour = parseInt(hourStr, 10);
+  return hour >= 16 ? 'from_work' : 'to_work';
+}
+
 export function minutesBetween(earlier, later) {
   if (!earlier || !later) return null;
   const [eh, em] = earlier.split(':').map(Number);

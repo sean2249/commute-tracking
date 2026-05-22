@@ -11,6 +11,8 @@ export const ICONS = {
   chevronLeft: (s = 20) => svg(s, '<polyline points="15 18 9 12 15 6"/>'),
   chevronRight: (s = 16) => svg(s, '<polyline points="9 18 15 12 9 6"/>'),
   chevronDown: (s = 16) => svg(s, '<polyline points="6 9 12 15 18 9"/>'),
+  arrowUp: (s = 48) => svg(s, '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>'),
+  arrowDown: (s = 48) => svg(s, '<line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>'),
   trash: (s = 16) => svg(s, '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>'),
   undo: (s = 16) => svg(s, '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>'),
   home: (s = 22) => svg(s, '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/>'),
