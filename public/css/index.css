@@ -127,15 +127,17 @@
 }
 
 .primary-action {
+  --action-color: var(--accent);
+  --action-color-hover: var(--accent-hover);
   min-height: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--sp-3);
-  background: var(--accent);
-  color: var(--accent-fg);
-  border: 2px solid var(--accent-hover);
+  background: var(--bg-elevated);
+  color: var(--fg);
+  border: 3px solid var(--action-color);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-1);
   font-size: var(--fs-2xl);
@@ -146,20 +148,23 @@
   -webkit-touch-callout: none;
   touch-action: manipulation;
   transition:
-    background var(--motion-base) var(--ease-out),
     border-color var(--motion-base) var(--ease-out),
-    color var(--motion-base) var(--ease-out),
+    background var(--motion-fast) var(--ease-out),
     transform var(--motion-fast) var(--ease-out),
     box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .primary-action[data-color="cool"] {
-  background: var(--accent-cool);
-  color: var(--accent-cool-fg);
-  border-color: var(--accent-cool-hover);
+  --action-color: var(--accent-cool);
+  --action-color-hover: var(--accent-cool-hover);
+}
+
+.primary-action__icon {
+  color: var(--action-color);
 }
 
 .primary-action:active {
+  background: var(--surface-press);
   transform: scale(0.98);
   box-shadow: none;
 }
@@ -191,7 +196,7 @@
 }
 
 .primary-action__icon svg {
-  stroke-width: 2.5;
+  stroke-width: 2;
 }
 
 .primary-action__label {
