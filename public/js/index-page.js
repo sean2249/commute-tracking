@@ -66,11 +66,17 @@ async function handleEntry(btn) {
   const labelText = btn.querySelector('.label').textContent;
   btn.dataset.label = labelText;
 
-  // Notification.requestPermission() must be invoked synchronously inside the
-  // user-gesture click handler — Safari and some Android browsers ignore it
-  // if it lands after any awaited operation. Fire-and-forget.
+  // Notification.requestPermission() AND PushManager.subscribe() must be
+  // invoked synchronously inside the user-gesture click handler — Safari/iOS
+  // drop the gesture token after any awaited operation. Chain subscribe off
+  // the permission promise to stay within the same gesture transaction.
   if (event === 'board') {
-    ensureNotificationPermission().catch(() => {});
+    ensureNotificationPermission()
+      .then((perm) => {
+        if (perm !== 'granted') return null;
+        return import('./push.js').then((m) => m.subscribeToPush());
+      })
+      .catch(() => {});
   }
 
   setButtonsBusy();

@@ -1,4 +1,4 @@
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL = [
   './',
   './index.html',
@@ -21,6 +21,7 @@ const SHELL = [
   './js/pair.js',
   './js/openBoard.js',
   './js/reminder.js',
+  './js/push.js',
   './js/index-page.js',
   './js/log-page.js',
   './js/charts-page.js',
@@ -62,8 +63,26 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
+self.addEventListener('push', (e) => {
+  let data = {};
+  if (e.data) {
+    try { data = e.data.json(); } catch { data = { body: e.data.text() }; }
+  }
+  const title = data.title || '通知';
+  const opts = {
+    body: data.body || ' ',
+    tag: data.tag || 'commute',
+    badge: 'icons/icon-180.png',
+    icon: 'icons/icon-180.png',
+    renotify: true,
+    data: { url: data.url || './index.html' },
+  };
+  e.waitUntil(self.registration.showNotification(title, opts));
+});
+
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
+  const target = (e.notification.data && e.notification.data.url) || './index.html';
   e.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of all) {
@@ -71,6 +90,12 @@ self.addEventListener('notificationclick', (e) => {
         return client.focus();
       }
     }
-    return self.clients.openWindow('./index.html');
+    return self.clients.openWindow(target);
   })());
+});
+
+self.addEventListener('pushsubscriptionchange', () => {
+  // iOS rotates push endpoints periodically. Re-subscription happens on the
+  // next board click (subscribeToPush() is idempotent via getSubscription()
+  // upsert by endpoint), so no SW-side action needed.
 });
