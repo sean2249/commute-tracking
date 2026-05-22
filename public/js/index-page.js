@@ -51,8 +51,21 @@ function renderPrimaryAction() {
 
   const iconEl = primaryBtn.querySelector('.primary-action__icon');
   const labelEl = primaryBtn.querySelector('.primary-action__label');
-  iconEl.innerHTML = ICONS[iconName](56);
+  const stubDirectionEl = primaryBtn.querySelector('.primary-action__stub-direction');
+  const routeEl = primaryBtn.querySelector('.primary-action__route');
+  const serialEl = primaryBtn.querySelector('.primary-action__serial');
+  const dateEl = primaryBtn.querySelector('.primary-action__date');
+  iconEl.innerHTML = ICONS[iconName](44);
   labelEl.textContent = labelText;
+  stubDirectionEl.textContent = DIRECTION_LABELS[direction];
+  routeEl.textContent = direction === 'to_work' ? '家 → 公司' : '公司 → 家';
+
+  const now = new Date();
+  const mmdd = formatDate(now).replace('-', '');
+  serialEl.textContent = `No. ${mmdd}`;
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const wkday = weekdayShort(((now.getDay() + 6) % 7) + 1).toUpperCase();
+  dateEl.textContent = `${months[now.getMonth()]} ${String(now.getDate()).padStart(2, '0')} · ${wkday}`;
 
   if (event === 'board') {
     const other = direction === 'to_work' ? '下班' : '上班';

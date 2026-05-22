@@ -129,20 +129,20 @@
 .primary-action {
   --action-color: var(--accent);
   --action-color-hover: var(--accent-hover);
+  --notch-r: 10px;
+  --notch-x: 28%;
   min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-3);
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  align-items: stretch;
   background: var(--bg-elevated);
   color: var(--fg);
   border: 3px solid var(--action-color);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-1);
-  font-size: var(--fs-2xl);
-  font-weight: 700;
-  padding: var(--sp-6);
+  padding: 0;
+  overflow: hidden;
+  position: relative;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -152,11 +152,96 @@
     background var(--motion-fast) var(--ease-out),
     transform var(--motion-fast) var(--ease-out),
     box-shadow var(--motion-fast) var(--ease-out);
+  --hole-r: 4px;
+  -webkit-mask:
+    radial-gradient(circle var(--notch-r) at var(--notch-x) 0, transparent 99%, #000 100%),
+    radial-gradient(circle var(--notch-r) at var(--notch-x) 100%, transparent 99%, #000 100%),
+    radial-gradient(circle var(--hole-r) at 14% 16%, transparent 99%, #000 100%);
+  -webkit-mask-composite: source-in;
+          mask:
+    radial-gradient(circle var(--notch-r) at var(--notch-x) 0, transparent 99%, #000 100%),
+    radial-gradient(circle var(--notch-r) at var(--notch-x) 100%, transparent 99%, #000 100%),
+    radial-gradient(circle var(--hole-r) at 14% 16%, transparent 99%, #000 100%);
+          mask-composite: intersect;
 }
 
 .primary-action[data-color="cool"] {
   --action-color: var(--accent-cool);
   --action-color-hover: var(--accent-cool-hover);
+}
+
+.primary-action__stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-3);
+  border-right: 2px dashed var(--action-color);
+  color: var(--action-color);
+}
+
+.primary-action__stub-direction {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.primary-action__main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--sp-4) var(--sp-6);
+  gap: var(--sp-2);
+}
+
+.primary-action__header,
+.primary-action__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.primary-action__brand,
+.primary-action__class {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.22em;
+  color: var(--fg-subtle);
+  text-transform: uppercase;
+}
+
+.primary-action__class {
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 1px 6px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.primary-action__route {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.04em;
+}
+
+.primary-action__date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--fg-subtle);
+  text-transform: uppercase;
+}
+
+.primary-action__serial {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--fg-subtle);
+  text-transform: uppercase;
 }
 
 .primary-action__icon {
@@ -191,18 +276,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
 }
 
 .primary-action__icon svg {
-  stroke-width: 2;
+  stroke-width: 2.25;
 }
 
 .primary-action__label {
+  align-self: center;
   font-size: var(--fs-2xl);
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  line-height: 1;
 }
 
 .primary-action .spinner {
