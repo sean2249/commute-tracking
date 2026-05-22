@@ -1,4 +1,4 @@
-const VERSION = 'v4';
+const VERSION = 'v5';
 const SHELL = [
   './',
   './index.html',
@@ -85,9 +85,18 @@ self.addEventListener('notificationclick', (e) => {
   const target = (e.notification.data && e.notification.data.url) || './index.html';
   e.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const targetUrl = new URL(target, self.location.href).href;
     for (const client of all) {
-      if (client.url.includes('/index.html') || client.url.endsWith('/')) {
-        return client.focus();
+      if (client.url === targetUrl) return client.focus();
+    }
+    for (const client of all) {
+      if ('navigate' in client) {
+        try {
+          await client.navigate(targetUrl);
+          return client.focus();
+        } catch {
+          // navigate can throw on cross-origin or detached frames; fall through.
+        }
       }
     }
     return self.clients.openWindow(target);

@@ -66,10 +66,14 @@ export async function unsubscribeFromPush() {
     if (!sub) return { ok: true };
     const endpoint = sub.endpoint;
     await sub.unsubscribe();
-    await supabase.rpc('unregister_push_subscription', {
+    const { error } = await supabase.rpc('unregister_push_subscription', {
       p_secret: secret,
       p_endpoint: endpoint,
     });
+    if (error) {
+      console.warn('[push] unregister RPC failed', error);
+      return { ok: false, reason: 'unregister-failed', error };
+    }
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err };
