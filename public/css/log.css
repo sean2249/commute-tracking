@@ -97,7 +97,8 @@
   background-image: repeating-linear-gradient(to right, var(--ink-line) 0 4px, transparent 4px 8px);
 }
 
-.log-list .pair-row.open { box-shadow: inset 3px 0 0 var(--am); background: var(--accent-bg-soft); }
+/* open = boarded, not yet alighted = live/on-road → leaf accent (not sun) */
+.log-list .pair-row.open { box-shadow: inset 3px 0 0 var(--leaf); background: rgba(92, 140, 74, 0.12); }
 .log-list .pair-row.orphan { box-shadow: inset 3px 0 0 var(--ink-faint); }
 
 .log-list .mono { font-feature-settings: "tnum" 1; }

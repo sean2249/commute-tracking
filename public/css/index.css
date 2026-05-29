@@ -515,7 +515,11 @@
   background-image: repeating-linear-gradient(to right, var(--ink-line) 0 4px, transparent 4px 8px);
 }
 
-.recent-list .pair-row.open { background: var(--accent-bg-soft); }
+/* open = boarded, not yet alighted = live/on-road → leaf accent (not sun) */
+.recent-list .pair-row.open {
+  background: rgba(92, 140, 74, 0.12);
+  box-shadow: inset 3px 0 0 var(--leaf);
+}
 
 .recent-list .mono { font-feature-settings: "tnum" 1; }
 .recent-list .date { color: var(--ink); font-weight: 500; }
