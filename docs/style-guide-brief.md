@@ -3,6 +3,16 @@
 > 把這份文件整份貼給 Claude，請它產出一張 **style guide 風格圖**（封面海報式、含 color swatch、typography、按鈕、status card、表格 row、chart 預覽）。
 > 完整 spec 在 [`frontend-design.md`](./frontend-design.md)，本檔是為產圖而濃縮的版本。
 
+> ⚠️ **已被取代（2026-05）。** 本檔描述的是舊的「Linear / SF-native、灰階克制、絕不引入 web font」方向。
+> 現行的視覺系統是 **「Slow Town Station」riso/risograph 暖色紙票風格**（暖奶油紙、sun/clay/leaf 三色、四種指定 web 字體）。
+> 規格見 `design_handoff_commute_style_system/`，token 落地在 `public/css/tokens.css`。
+> 下列兩點已**刻意推翻**：
+> - **字型**：新系統需要四種 web font（DM Serif Display / Noto Serif TC / Caveat / JetBrains Mono，無替代）。
+>   以 `display=swap` + `preconnect` 載入——首屏文字立即以系統 serif fallback 繪製（無 FOIT），字體下載完成後才置換，
+>   因此「文字 < 200ms 可見」的目標仍成立，只是不再堅持「絕不引入 web font」。
+> - **色票 / 美學**：amber 單 accent + 灰階 → 暖奶油紙 + sun/clay/leaf 三色 riso 疊印。
+> 其餘排版克制、tabular 數字、密集表格列、border 主導等原則仍沿用。
+
 ---
 
 ## 1. 產品定位
@@ -31,7 +41,7 @@
 | **1970s 公車時刻表**           | 等寬 tabular 數字感、表格列高緊湊、欄位對齊比裝飾重要。                  |
 | **校車黃 / 站牌黃**            | accent 是 amber `#F59E0B`——交通語意，警示但不刺眼。                      |
 | **Vercel / Stripe dashboard**  | 卡片 elevation 只有兩階、border 比 shadow 更主導、focus ring 是 accent。 |
-| **iOS native (SF Pro)**        | 字型直接走系統 stack、不引入 web font，冷啟動 < 200ms 為硬指標。          |
+| **iOS native (SF Pro)**        | ~~字型直接走系統 stack、不引入 web font~~（已被 Slow Town Station 取代，見頂部註記）。冷啟動「文字 < 200ms 可見」仍維持，改用 `display=swap` fallback。 |
 
 ### 反面參考（**不要**做的方向）
 
@@ -86,7 +96,9 @@ Accent      --accent          #FBBF24   amber 400（dark 略提亮）
 
 ## 4. 字型（Typography）
 
-兩套字 stack，**絕不引入 web font**（冷啟動硬指標）：
+> ⚠️ **已被取代**：以下「絕不引入 web font」的兩套系統字 stack 是舊方向。現行 Slow Town Station 使用四種指定 web font（見頂部註記與 `tokens.css`）。
+
+舊的兩套字 stack（已停用）：
 
 - **Prose**（介面文字、按鈕標籤、節標題）
   `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif`

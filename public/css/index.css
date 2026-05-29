@@ -13,6 +13,13 @@
   50%      { opacity: 1; }
 }
 
+/* These decorative loops use literal durations, so the --motion-* token
+   zeroing in tokens.css doesn't reach them — disable them explicitly. */
+@media (prefers-reduced-motion: reduce) {
+  .status-strip[data-state="tracking"] .row:first-child::before,
+  .status-strip .pred-pending::after { animation: none; }
+}
+
 /* ---------- Status strip → live ride card (torn carbon copy) ---------- */
 .status-strip {
   --r-edge: var(--ink-line);

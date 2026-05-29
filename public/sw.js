@@ -1,4 +1,4 @@
-const VERSION = 'v5';
+const VERSION = 'v6';
 const SHELL = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const SHELL = [
   './charts.html',
   './unlock.html',
   './manifest.webmanifest',
+  './assets/bus-right-512.png',
   './css/tokens.css',
   './css/base.css',
   './css/index.css',

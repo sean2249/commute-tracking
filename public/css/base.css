@@ -197,6 +197,12 @@ a {
   animation: skel-fade 1.8s ease-in-out infinite;
 }
 
+/* Literal infinite animations bypass the --motion-* token zeroing, so
+   honor prefers-reduced-motion explicitly for decorative loops. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; opacity: 0.4; }
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%      { transform: translateX(-2px); }
