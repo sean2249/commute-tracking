@@ -17,7 +17,8 @@
    zeroing in tokens.css doesn't reach them — disable them explicitly. */
 @media (prefers-reduced-motion: reduce) {
   .status-strip[data-state="tracking"] .row:first-child::before,
-  .status-strip .pred-pending::after { animation: none; }
+  .status-strip .pred-pending::after,
+  .primary-action .spinner { animation: none; }
 }
 
 /* ---------- Status strip → live ride card (torn carbon copy) ---------- */
