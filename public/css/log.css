@@ -167,12 +167,14 @@
   transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
+/* Neutral ink CTA — generic navigation, not a morning/to_work action, so
+   the spec forbids the sun accent here (design-system-slow-town-station.md:105). */
 .btn-primary {
-  background: var(--am);
-  color: var(--ink);
-  border-color: var(--am-deep);
+  background: var(--ink);
+  color: var(--paper-light);
+  border-color: var(--ink);
 }
-.btn-primary:active { background: var(--am-deep); color: var(--paper-light); }
+.btn-primary:active { background: var(--ink-soft); }
 
 .empty-state {
   display: flex;
