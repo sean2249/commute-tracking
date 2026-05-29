@@ -5,7 +5,7 @@
 
 > ⚠️ **已被取代（2026-05）。** 本檔描述的是舊的「Linear / SF-native、灰階克制、絕不引入 web font」方向。
 > 現行的視覺系統是 **「Slow Town Station」riso/risograph 暖色紙票風格**（暖奶油紙、sun/clay/leaf 三色、四種指定 web 字體）。
-> 規格見 `design_handoff_commute_style_system/`，token 落地在 `public/css/tokens.css`。
+> 完整規格見 [`design-system-slow-town-station.md`](./design-system-slow-town-station.md)，token 落地在 `public/css/tokens.css`。
 > 下列兩點已**刻意推翻**：
 > - **字型**：新系統需要四種 web font（DM Serif Display / Noto Serif TC / Caveat / JetBrains Mono，無替代）。
 >   以 `display=swap` + `preconnect` 載入——首屏文字立即以系統 serif fallback 繪製（無 FOIT），字體下載完成後才置換，
