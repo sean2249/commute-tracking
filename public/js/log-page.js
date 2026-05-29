@@ -88,7 +88,7 @@ function renderPairRow(p) {
   const trash = ICONS.trash ? ICONS.trash(16) : '×';
   const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
   return `
-    <li class="pair-row${rowClass}" id="row-${primary.id}">
+    <li class="pair-row${rowClass}" id="row-${primary.id}" data-direction="${p.direction}">
       <span class="mono date">${formatDate(p.local_date)}</span>
       <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
       <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>

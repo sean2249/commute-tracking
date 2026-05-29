@@ -1,118 +1,218 @@
+/* ============================================================
+   Commute — "Slow Town Station" design tokens
+   Riso / risograph pastoral aesthetic. Warm cream paper, three
+   strict accents (sun / clay / leaf), four required font families.
+
+   The legacy token names (--bg, --fg, --accent, ...) are kept as a
+   COMPATIBILITY LAYER so existing component CSS + charts-page.js
+   (which reads --accent / --fg-muted at runtime) pick up the new
+   palette automatically. The risograph design tokens (--paper,
+   --ink, --am, --pm, --leaf, ...) live alongside them and are used
+   directly by the rebuilt hero components.
+   ============================================================ */
+
 :root {
-  --bg: #FAFAF9;
-  --bg-elevated: #FFFFFF;
-  --fg: #18181B;
-  --fg-muted: #71717A;
-  --fg-subtle: #A1A1AA;
-  --accent: #F59E0B;
-  --accent-hover: #D97706;
-  --accent-fg: #1C1917;
-  --accent-bg-soft: rgba(245, 158, 11, 0.08);
-  --accent-cool: #6366F1;
-  --accent-cool-hover: #4F46E5;
-  --accent-cool-fg: #FFFFFF;
-  --accent-cool-bg-soft: rgba(99, 102, 241, 0.08);
-  --success: #16A34A;
-  --success-bg: #DCFCE7;
-  --warning: #D97706;
-  --warning-bg: #FEF3C7;
-  --danger: #DC2626;
-  --danger-bg: #FEE2E2;
-  --border: #E4E4E7;
-  --border-strong: #D4D4D8;
-  --surface-hover: #F4F4F5;
-  --surface-press: #E4E4E7;
+  /* ---- Paper & ink — warm, never pure ---- */
+  --paper:        #F2EBD3;   /* sun-bleached cream — primary surface */
+  --paper-light:  #F8F2DE;   /* lighter wash — card surfaces */
+  --paper-deep:   #E8DCBA;   /* shaded paper — page bg */
+  --paper-edge:   #D9C9A0;   /* worn edge */
+  --ink:          #2B2417;   /* warm dark — body text */
+  --ink-soft:     #3F3520;
+  --ink-muted:    #7A6B52;   /* secondary text */
+  --ink-faint:    #B7A887;   /* tertiary / disabled */
+  --ink-line:     #C7B894;   /* hairline rules */
 
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.03);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  /* ---- Three accents — same chroma, three hues ---- */
+  --am:           #D9A441;   /* sun mustard — MORNING / to_work */
+  --am-soft:      #F2DDA8;
+  --am-deep:      #B07F2A;
+  --am-overprint: rgba(217, 164, 65, 0.55);
 
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --sp-12: 48px;
+  --pm:           #A65A3A;   /* clay terracotta — EVENING / from_work */
+  --pm-soft:      #ECC2AC;
+  --pm-deep:      #7C3D24;
+  --pm-overprint: rgba(166, 90, 58, 0.5);
 
-  --r-sm: 4px;
-  --r-md: 8px;
-  --r-lg: 12px;
-  --r-xl: 16px;
+  --leaf:         #5C8C4A;   /* grass green — LIVE / on-road */
+  --leaf-soft:    #C7DDB2;
+  --leaf-deep:    #3F6A2E;
+  --leaf-overprint: rgba(92, 140, 74, 0.5);
+
+  /* ---- Sky — time-of-day backdrops for illustrations ---- */
+  --sky-dawn:     #F1D4A6;
+  --sky-day:      #DDE3CD;
+  --sky-dusk:     #E89060;
+  --sky-night:    #1F2940;
+  --sky-night-2:  #2D3A5A;
+  --star:         #F4E8C2;
+
+  /* ---- Paper texture (horizontal photocopier hairline) ---- */
+  --paper-texture: repeating-linear-gradient(
+    to bottom, transparent 0 3px, rgba(120, 90, 30, 0.025) 3px 4px);
+  --ticket-texture: repeating-linear-gradient(
+    to bottom, transparent 0 3px, rgba(120, 90, 30, 0.06) 3px 4px);
+
+  /* ---- Compatibility layer (legacy names → riso palette) ---- */
+  --bg: #E5DDC2;                         /* page background */
+  --bg-elevated: var(--paper-light);     /* card surfaces */
+  --fg: var(--ink);
+  --fg-muted: var(--ink-muted);
+  --fg-subtle: var(--ink-faint);
+  --accent: var(--am);
+  --accent-hover: var(--am-deep);
+  --accent-fg: var(--ink);
+  --accent-bg-soft: rgba(217, 164, 65, 0.12);
+  --accent-cool: var(--pm);
+  --accent-cool-hover: var(--pm-deep);
+  --accent-cool-fg: var(--paper-light);
+  --accent-cool-bg-soft: rgba(166, 90, 58, 0.12);
+  --success: var(--leaf);
+  --success-bg: var(--leaf-soft);
+  --warning: var(--am-deep);
+  --warning-bg: var(--am-soft);
+  --danger: #BE3F2B;                     /* warm red — never clay (reserved for PM) */
+  --danger-bg: #F1D4C9;
+  --border: var(--ink-line);
+  --border-strong: var(--ink-faint);
+  --surface-hover: var(--paper-deep);
+  --surface-press: var(--paper-edge);
+
+  /* ---- Shadow — warm-tinted, like paper on a wooden table ---- */
+  --shadow-1: 0 1px 0 rgba(70, 50, 20, 0.05), 0 2px 6px rgba(80, 55, 20, 0.08);
+  --shadow-2: 0 2px 0 rgba(70, 50, 20, 0.06), 0 8px 22px rgba(80, 55, 20, 0.12);
+
+  /* ---- Spacing — pastoral, generous ---- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 56px; --sp-16: 72px;
+
+  /* ---- Radius — mostly small corners, no pills ---- */
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 14px;
+  --r-xl: 14px;
   --r-full: 9999px;
 
-  --fs-xs: 11px;
-  --fs-sm: 13px;
-  --fs-base: 15px;
-  --fs-lg: 18px;
-  --fs-xl: 22px;
-  --fs-2xl: 28px;
+  /* ---- Type scale ---- */
+  --fs-xs: 11px;    /* labels, table headers, stamp captions (mono) */
+  --fs-sm: 13px;    /* table body, captions, paper notes */
+  --fs-base: 15px;  /* default UI text */
+  --fs-lg: 19px;    /* buttons, card titles */
+  --fs-xl: 26px;    /* block titles (display) */
+  --fs-2xl: 36px;   /* ETA / time hero (mono) */
+  --fs-3xl: 56px;   /* section titles (display) */
+  --fs-hand: 22px;  /* hand notes, early/late annotations */
 
+  /* ---- Motion — three named curves, do not invent new ones ---- */
   --motion-fast: 120ms;
   --motion-base: 200ms;
   --motion-slow: 320ms;
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: ease-in-out;
+  --ease-lurch: cubic-bezier(0.6, 0.05, 0.4, 0.95);   /* kick-and-stop */
+  --ease-smooth: ease-in-out;                          /* progress / counters */
+  --ease-bouncy: cubic-bezier(0.34, 1.56, 0.64, 1);    /* stamp impact, arrival hop */
+  --ease-spring: var(--ease-bouncy);                   /* legacy alias */
 
-  --font-prose: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, "Cascadia Mono", "Roboto Mono", monospace;
+  /* ---- Type families — four families, no substitutes ---- */
+  --font-display: "DM Serif Display", "Noto Serif TC", Georgia, serif;
+  --font-body:    "Noto Serif TC", "DM Serif Display", Georgia, serif;
+  --font-hand:    "Caveat", "DM Serif Display", cursive;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-prose:   var(--font-body);   /* legacy alias */
 }
 
+/* ============================================================
+   Dark mode — triggered by prefers-color-scheme (a time-of-day
+   lerp would live in JS; the palette below is the night sampler).
+   CRITICAL: tickets themselves stay warm-amber at night — only the
+   chrome around them flips. Ticket-warm overrides live in the
+   component CSS (.primary-action, .ride-card).
+   ============================================================ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #09090B;
-    --bg-elevated: #18181B;
-    --fg: #FAFAF9;
-    --fg-muted: #A1A1AA;
-    --fg-subtle: #71717A;
-    --accent: #FBBF24;
-    --accent-hover: #F59E0B;
-    --accent-fg: #1C1917;
-    --accent-bg-soft: rgba(251, 191, 36, 0.10);
-    --accent-cool: #818CF8;
-    --accent-cool-hover: #6366F1;
-    --accent-cool-fg: #0F0F23;
-    --accent-cool-bg-soft: rgba(129, 140, 248, 0.12);
-    --success: #22C55E;
-    --success-bg: #14532D;
-    --warning: #FBBF24;
-    --warning-bg: #451A03;
-    --danger: #F87171;
-    --danger-bg: #450A0A;
-    --border: #27272A;
-    --border-strong: #3F3F46;
-    --surface-hover: #27272A;
-    --surface-press: #3F3F46;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(0, 0, 0, 0.3);
-    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+    --paper:        #232E48;   /* ink-pool blue */
+    --paper-light:  #2D3A5A;
+    --paper-deep:   #1F2940;
+    --paper-edge:   #404C70;
+    --ink:          #F4E8C2;   /* warm star paper */
+    --ink-soft:     #DCCB9C;
+    --ink-muted:    #95876A;
+    --ink-faint:    #6B6048;
+    --ink-line:     #3E4A6C;
+
+    --am:           #E6B255;
+    --am-soft:      #4A3818;
+    --am-deep:      #F2D08A;
+    --am-overprint: rgba(230, 178, 85, 0.5);
+    --pm:           #C27050;
+    --pm-soft:      #3E2418;
+    --pm-deep:      #E89378;
+    --leaf:         #7AAB60;
+    --leaf-soft:    #2E4A22;
+    --leaf-deep:    #A8CC92;
+
+    --paper-texture: repeating-linear-gradient(
+      to bottom, transparent 0 3px, rgba(0, 0, 0, 0.08) 3px 4px);
+    --ticket-texture: repeating-linear-gradient(
+      to bottom, transparent 0 3px, rgba(120, 90, 30, 0.06) 3px 4px);
+
+    --bg: #1B243A;
+    --bg-elevated: var(--paper-light);
+    --accent-fg: #2B2417;
+    --accent-cool-fg: #2B2417;
+    --accent-bg-soft: rgba(230, 178, 85, 0.14);
+    --accent-cool-bg-soft: rgba(194, 112, 80, 0.16);
+    --danger: #E68B78;
+    --danger-bg: #4A2218;
+    --border-strong: #4F5B80;
+    --surface-hover: #2D3A5A;
+    --surface-press: #404C70;
+    --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.28);
+    --shadow-2: 0 2px 0 rgba(0, 0, 0, 0.2), 0 10px 26px rgba(0, 0, 0, 0.4);
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #09090B;
-  --bg-elevated: #18181B;
-  --fg: #FAFAF9;
-  --fg-muted: #A1A1AA;
-  --fg-subtle: #71717A;
-  --accent: #FBBF24;
-  --accent-hover: #F59E0B;
-  --accent-fg: #1C1917;
-  --accent-bg-soft: rgba(251, 191, 36, 0.10);
-  --accent-cool: #818CF8;
-  --accent-cool-hover: #6366F1;
-  --accent-cool-fg: #0F0F23;
-  --accent-cool-bg-soft: rgba(129, 140, 248, 0.12);
-  --success: #22C55E;
-  --success-bg: #14532D;
-  --warning: #FBBF24;
-  --warning-bg: #451A03;
-  --danger: #F87171;
-  --danger-bg: #450A0A;
-  --border: #27272A;
-  --border-strong: #3F3F46;
-  --surface-hover: #27272A;
-  --surface-press: #3F3F46;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(0, 0, 0, 0.3);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --paper:        #232E48;
+  --paper-light:  #2D3A5A;
+  --paper-deep:   #1F2940;
+  --paper-edge:   #404C70;
+  --ink:          #F4E8C2;
+  --ink-soft:     #DCCB9C;
+  --ink-muted:    #95876A;
+  --ink-faint:    #6B6048;
+  --ink-line:     #3E4A6C;
+
+  --am:           #E6B255;
+  --am-soft:      #4A3818;
+  --am-deep:      #F2D08A;
+  --am-overprint: rgba(230, 178, 85, 0.5);
+  --pm:           #C27050;
+  --pm-soft:      #3E2418;
+  --pm-deep:      #E89378;
+  --leaf:         #7AAB60;
+  --leaf-soft:    #2E4A22;
+  --leaf-deep:    #A8CC92;
+
+  --paper-texture: repeating-linear-gradient(
+    to bottom, transparent 0 3px, rgba(0, 0, 0, 0.08) 3px 4px);
+  --ticket-texture: repeating-linear-gradient(
+    to bottom, transparent 0 3px, rgba(120, 90, 30, 0.06) 3px 4px);
+
+  --bg: #1B243A;
+  --bg-elevated: var(--paper-light);
+  --accent-fg: #2B2417;
+  --accent-cool-fg: #2B2417;
+  --accent-bg-soft: rgba(230, 178, 85, 0.14);
+  --accent-cool-bg-soft: rgba(194, 112, 80, 0.16);
+  --danger: #E68B78;
+  --danger-bg: #4A2218;
+  --border-strong: #4F5B80;
+  --surface-hover: #2D3A5A;
+  --surface-press: #404C70;
+  --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-2: 0 2px 0 rgba(0, 0, 0, 0.2), 0 10px 26px rgba(0, 0, 0, 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
