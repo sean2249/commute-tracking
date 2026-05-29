@@ -21,23 +21,23 @@
   position: relative;
 }
 
-/* a small corner dot-tag, riso accent */
+/* Neutral corner marker — these are non-directional stats (events, paired,
+   7d avg, missing), so the strict am/pm/leaf accents don't apply here. */
 .aggregate-cell::after {
   content: "";
   position: absolute;
   top: var(--sp-3); right: var(--sp-3);
   width: 8px; height: 8px;
   border-radius: var(--r-full);
-  background: var(--am);
+  background: var(--ink-faint);
 }
-.aggregate-cell:nth-child(2)::after { background: var(--leaf); }
-.aggregate-cell:nth-child(3)::after { background: var(--pm); }
-.aggregate-cell:nth-child(4)::after { background: var(--ink); }
 
+/* Glance numerals stay mono + tnum for tabular alignment (spec §02/§06). */
 .aggregate-cell .num {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
   font-size: var(--fs-2xl);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1;
   color: var(--ink);
   letter-spacing: -0.01em;

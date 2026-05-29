@@ -42,11 +42,23 @@
 
 .chip:active { transform: scale(0.97); }
 
+/* Neutral selected treatment for generic filters (status/weather). Only the
+   direction chips carry semantic color — sun for to_work, clay for from_work. */
 .chip[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper-light);
+  border-color: var(--ink);
+  font-weight: 600;
+}
+.chip[data-value="to_work"][aria-pressed="true"] {
   background: var(--am);
   color: var(--ink);
   border-color: var(--am-deep);
-  font-weight: 600;
+}
+.chip[data-value="from_work"][aria-pressed="true"] {
+  background: var(--pm);
+  color: var(--paper-light);
+  border-color: var(--pm-deep);
 }
 
 /* ---------- Paired-day diary rows ---------- */
