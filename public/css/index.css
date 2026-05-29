@@ -18,7 +18,7 @@
 @media (prefers-reduced-motion: reduce) {
   .status-strip[data-state="tracking"] .row:first-child::before,
   .status-strip .pred-pending::after,
-  .primary-action .spinner { animation: none; }
+  .primary-action .loading-dots { animation: none; }
 }
 
 /* ---------- Status strip → live ride card (torn carbon copy) ---------- */
@@ -423,14 +423,15 @@
   pointer-events: none;
 }
 
-.primary-action .spinner {
-  width: 26px; height: 26px;
-  border: 3px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  opacity: 0.6;
+/* No spinners (design-system-slow-town-station.md:329 — "loading is
+   waiting"). The save indicator is the spec-approved dot-pulse "···". */
+.primary-action .loading-dots {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--t-stamp);
+  animation: dot-pulse 1.6s ease-in-out infinite;
 }
 
 .primary-action__hint {
@@ -444,8 +445,6 @@
 }
 
 .primary-action.shake { animation: shake 0.24s ease-in-out; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Tickets stay warm-amber at night — only chrome flips */
 @media (prefers-color-scheme: dark) {

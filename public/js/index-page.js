@@ -89,7 +89,7 @@ function setIdle() {
 
 function showLoading() {
   primaryBtn.dataset.state = 'loading';
-  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="spinner" aria-label="loading"></span>';
+  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="loading-dots" role="status" aria-label="儲存中">···</span>';
   primaryBtn.querySelector('.primary-action__label').textContent = '';
 }
 
