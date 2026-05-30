@@ -5,15 +5,21 @@ import { weatherIcon, isWeatherUnavailable, ICONS } from './icons.js';
 import { pairEvents } from './pair.js';
 import { getOpenBoard, setOpenBoard, clearOpenBoard, reconcileWithServer } from './openBoard.js';
 import { init as initReminder, cancel as cancelReminder, schedule as scheduleReminder, ensureNotificationPermission } from './reminder.js';
+import { routeFor } from './settings.js';
 
 const strip = document.getElementById('status-strip');
 const recentList = document.getElementById('recent-list');
 const primaryBtn = document.getElementById('primary-action');
 const primaryHint = document.getElementById('primary-action-hint');
+const scene = document.getElementById('scene');
+const sceneBus = document.getElementById('scene-bus');
+const sceneCaption = document.getElementById('scene-caption');
 
 const DIRECTION_LABELS = { to_work: '上班', from_work: '下班' };
 const EVENT_LABELS = { board: '上車', alight: '下車' };
 const DIRECTION_ARROWS = { to_work: '↑', from_work: '↓' };
+// Hand verbs (Caveat is latin-only): board AM / board PM / alight.
+const HAND_VERB = { board_to_work: 'all aboard', board_from_work: 'heading home', alight: 'all off' };
 const LONG_PRESS_MS = 500;
 
 let recentCache = [];
@@ -33,46 +39,81 @@ function currentBoardDirection() {
   return directionOverride || inferDirectionByTime();
 }
 
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+// Time-of-day for the scene sky. Day 07:00, night 17:00 (per spec);
+// dawn/dusk are the soft shoulders around them.
+function todForHour(h) {
+  if (h >= 5 && h < 7) return 'dawn';
+  if (h >= 7 && h < 17) return 'day';
+  if (h >= 17 && h < 19) return 'dusk';
+  return 'night';
+}
+
+function updateScene(state, direction) {
+  if (!scene) return;
+  const now = new Date();
+  scene.dataset.state = state;
+  scene.dataset.dir = direction;
+  scene.dataset.tod = todForHour(now.getHours());
+  if (sceneBus) {
+    const facing = direction === 'from_work' ? 'left' : 'right';
+    const src = `assets/bus-${facing}-512.png`;
+    if (!sceneBus.src.endsWith(src)) sceneBus.src = src;
+  }
+  if (sceneCaption) {
+    const hhmm = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+    const word = state === 'B' ? 'on the road' : (state === 'C' ? 'evening' : 'morning');
+    sceneCaption.textContent = `${word} · ${hhmm}`;
+  }
+}
+
 function renderPrimaryAction() {
   const ob = getOpenBoard();
   const event = ob ? 'alight' : 'board';
   const direction = ob ? ob.direction : currentBoardDirection();
   const colorVariant = direction === 'from_work' ? 'cool' : 'warm';
   const labelText = EVENT_LABELS[event];
-  const iconName = event === 'board' ? 'arrowUp' : 'arrowDown';
 
   primaryBtn.dataset.event = event;
   primaryBtn.dataset.direction = direction;
   primaryBtn.dataset.color = colorVariant;
-  primaryBtn.setAttribute(
-    'aria-label',
-    `${DIRECTION_LABELS[direction]} · ${labelText}`,
-  );
+  primaryBtn.dataset.state = '';
+  primaryBtn.setAttribute('aria-label', `${DIRECTION_LABELS[direction]} · ${labelText}`);
 
-  const iconEl = primaryBtn.querySelector('.primary-action__icon');
-  const labelEl = primaryBtn.querySelector('.primary-action__label');
-  const stubDirectionEl = primaryBtn.querySelector('.primary-action__stub-direction');
-  const routeEl = primaryBtn.querySelector('.primary-action__route');
-  const serialEl = primaryBtn.querySelector('.primary-action__serial');
-  const dateEl = primaryBtn.querySelector('.primary-action__date');
-  iconEl.innerHTML = ICONS[iconName](44);
-  labelEl.textContent = labelText;
-  stubDirectionEl.textContent = DIRECTION_LABELS[direction];
-  routeEl.textContent = direction === 'to_work' ? '家 → 公司' : '公司 → 家';
-
+  // Ticket body: date / hand verb / station pair (from settings) / glyph / ticks.
   const now = new Date();
-  const mmdd = formatDate(now).replace('-', '');
-  serialEl.textContent = `No. ${mmdd}`;
-  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  const wkday = weekdayShort(((now.getDay() + 6) % 7) + 1).toUpperCase();
-  dateEl.textContent = `${months[now.getMonth()]} ${String(now.getDate()).padStart(2, '0')} · ${wkday}`;
+  const dateStr = `${now.getFullYear()}·${pad2(now.getMonth() + 1)}·${pad2(now.getDate())}`;
+  const verb = event === 'board' ? HAND_VERB[`board_${direction}`] : HAND_VERB.alight;
+  const [from, to] = routeFor(direction);
+  const glyph = event === 'board' ? '↑' : '↓';
+  const ticks = event === 'board' ? 'BOARD' : 'ALIGHT';
+
+  setText('pa-date', dateStr);
+  setText('pa-verb', verb);
+  setText('pa-from-cn', from.cn);
+  setText('pa-from-en', from.en);
+  setText('pa-to-cn', to.cn);
+  setText('pa-to-en', to.en);
+  setText('pa-glyph', glyph);
+  setText('pa-ticks', ticks);
+  setText('pa-stamp', glyph);
+
+  // Scene reflects A (morning wait) / B (on road) / C (evening wait).
+  const sceneState = ob ? 'B' : (direction === 'from_work' ? 'C' : 'A');
+  updateScene(sceneState, direction);
 
   if (event === 'board') {
-    const other = direction === 'to_work' ? '下班' : '上班';
-    primaryHint.textContent = `長按可切換為${other}方向`;
+    const other = direction === 'to_work' ? 'evening' : 'morning';
+    primaryHint.textContent = `hold to switch to ${other}`;
   } else {
-    primaryHint.textContent = `寫入後會自動帶入「${DIRECTION_LABELS[direction]}」方向`;
+    primaryHint.textContent = '';
   }
+}
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
 }
 
 function setBusy() {
@@ -89,8 +130,8 @@ function setIdle() {
 
 function showLoading() {
   primaryBtn.dataset.state = 'loading';
-  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="loading-dots" role="status" aria-label="儲存中">···</span>';
-  primaryBtn.querySelector('.primary-action__label').textContent = '';
+  const g = document.getElementById('pa-glyph');
+  if (g) g.innerHTML = '<span class="loading-dots" role="status" aria-label="儲存中">···</span>';
 }
 
 function flashState(state) {
@@ -200,6 +241,9 @@ async function handlePrimary() {
 
   directionOverride = null;
   setIdle();
+  // Stamp the completed action (saving stamp = bouncy impact on success).
+  setText('pa-stamp', event === 'board' ? '↑' : '↓');
+  if (navigator.vibrate) { try { navigator.vibrate(event === 'board' ? 30 : [20, 40, 20]); } catch {} }
   flashState('success');
 
   latestEvent = {
@@ -247,7 +291,7 @@ function renderStrip(payload) {
   if (payload.state === 'empty') {
     strip.dataset.state = 'empty';
     delete strip.dataset.direction;
-    strip.innerHTML = '<img class="bus" src="assets/bus-right-512.png" alt="" aria-hidden="true"><div>尚無紀錄。按下方上車鍵開始。</div>';
+    strip.innerHTML = '<div>早安。準備好就按下方上車。</div>';
     return;
   }
   if (payload.state === 'tracking') {

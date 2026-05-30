@@ -15,37 +15,62 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+TC:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/scene.css">
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
   <header class="app-header">
     <h1>Commute</h1>
-    <a class="gear" href="unlock.html" aria-label="Settings" data-icon="gear" data-size="20"></a>
+    <a class="gear" href="settings.html" aria-label="Settings" data-icon="gear" data-size="20"></a>
   </header>
 
+  <!-- Pastoral scene: A (morning wait) / B (on the road, bus lurches) / C (evening) -->
+  <div class="scene" id="scene" data-state="A" data-tod="day" aria-hidden="true">
+    <div class="sky"></div>
+    <div class="stars"></div>
+    <div class="hill h1"></div>
+    <div class="hill h2"></div>
+    <div class="ground"></div>
+    <div class="office" aria-hidden="true"></div>
+    <div class="tree t1"></div>
+    <div class="tree t2"></div>
+    <div class="house" aria-hidden="true"></div>
+    <div class="stopsign-mini" aria-hidden="true"></div>
+    <div class="master" aria-hidden="true"></div>
+    <div class="road"></div>
+    <img class="bus" id="scene-bus" src="assets/bus-right-512.png" alt="" aria-hidden="true">
+    <span class="scene-caption" id="scene-caption"></span>
+  </div>
+
   <section id="status-strip" class="status-strip" data-state="empty" aria-live="polite">
-    <img class="bus" src="assets/bus-right-512.png" alt="" aria-hidden="true">
-    <div>尚無紀錄。按下方上車鍵開始。</div>
+    <div>早安。準備好就按下方上車。</div>
   </section>
 
   <div class="entry-buttons">
     <button class="primary-action" id="primary-action" type="button" aria-live="polite">
-      <span class="primary-action__stub" aria-hidden="true">
-        <span class="primary-action__stub-direction"></span>
-        <span class="primary-action__icon"></span>
-        <span class="primary-action__serial"></span>
-      </span>
-      <span class="primary-action__main">
-        <span class="primary-action__header" aria-hidden="true">
-          <span class="primary-action__brand">PASS · 通勤券</span>
-          <span class="primary-action__class">ONE WAY</span>
+      <span class="pas-body">
+        <span class="pas-meta" aria-hidden="true">
+          <span class="pas-date" id="pa-date"></span>
+          <span class="pas-verb" id="pa-verb"></span>
         </span>
-        <span class="primary-action__label"></span>
-        <span class="primary-action__footer" aria-hidden="true">
-          <span class="primary-action__route"></span>
-          <span class="primary-action__date"></span>
+        <span class="pas-stations" aria-hidden="true">
+          <span class="pas-stn">
+            <span class="pas-cn" id="pa-from-cn"></span>
+            <span class="pas-en" id="pa-from-en"></span>
+          </span>
+          <span class="pas-arrow">→</span>
+          <span class="pas-stn">
+            <span class="pas-cn" id="pa-to-cn"></span>
+            <span class="pas-en" id="pa-to-en"></span>
+          </span>
         </span>
       </span>
+      <span class="pas-punch" aria-hidden="true">
+        <span class="pas-hole"></span>
+        <span class="pas-glyph" id="pa-glyph"></span>
+        <span class="pas-ticks" id="pa-ticks"></span>
+      </span>
+      <span class="pas-stamp" id="pa-stamp" aria-hidden="true"></span>
     </button>
     <p class="primary-action__hint" id="primary-action-hint"></p>
   </div>

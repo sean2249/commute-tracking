@@ -204,12 +204,12 @@
   border-color: var(--danger);
 }
 
-/* ---------- Primary action → paper commute ticket ---------- */
+/* ---------- Primary action → paper commute ticket (left body / right punch) ---------- */
 .entry-buttons {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   margin-bottom: var(--sp-8);
 }
 
@@ -222,9 +222,12 @@
   --punch:   var(--paper-light);
 
   position: relative;
-  min-height: 168px;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  min-height: 132px;
   display: grid;
-  grid-template-columns: 86px 1fr;
+  grid-template-columns: 1fr 60px;
   align-items: stretch;
   background: var(--t-paper);
   background-image: var(--ticket-texture);
@@ -266,180 +269,156 @@
   --t-stamp: var(--pm-deep);
 }
 
-/* ----- Stub / punch column (left) ----- */
-.primary-action__stub {
+/* ----- Body (left) ----- */
+.pas-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  min-width: 0;
+}
+.pas-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+.pas-date {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--t-ink);
+  padding-top: 3px;
+}
+.pas-verb {
+  font-family: var(--font-hand);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--t-stamp);
+  transform: rotate(-3deg);
+  white-space: nowrap;
+}
+.pas-stations {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+.pas-stn { display: flex; flex-direction: column; line-height: 1; min-width: 0; }
+.pas-cn {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--t-ink);
+  white-space: nowrap;
+}
+.pas-en {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pas-arrow {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--t-stamp);
+  margin-top: 4px;
+}
+
+/* ----- Punch column (right, 60px) ----- */
+.pas-punch {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
-  padding: var(--sp-4) var(--sp-2);
   color: var(--t-stamp);
 }
-/* Vertical dashed perforation between stub and body */
-.primary-action__stub::after {
+.pas-punch::before {
   content: "";
   position: absolute;
-  top: 12px; bottom: 12px; right: 0;
+  top: 12px; bottom: 12px; left: 0;
   width: 1px;
   background-image: linear-gradient(to bottom, var(--t-stamp) 0 3px, transparent 3px 7px);
   background-size: 1px 7px;
 }
-/* Punch hole near the top of the stub */
-.primary-action__stub::before {
-  content: "";
-  position: absolute;
-  top: 14px; left: 50%;
-  transform: translateX(-50%);
+.pas-hole {
   width: 11px; height: 11px;
   border-radius: var(--r-full);
   background: var(--punch);
   box-shadow: inset 0 1px 1.5px rgba(43, 36, 23, 0.4);
   border: 1px solid rgba(43, 36, 23, 0.24);
 }
-
-.primary-action__stub-direction {
+.pas-glyph {
   font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  margin-top: var(--sp-4);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1;
 }
-
-.primary-action__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: var(--t-stamp);
+.pas-glyph .loading-dots {
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  animation: dot-pulse 1.6s ease-in-out infinite;
 }
-.primary-action__icon svg { stroke-width: 2; }
-
-.primary-action__serial {
+.pas-ticks {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   font-weight: 700;
-  text-transform: uppercase;
-  color: var(--t-stamp);
 }
 
-/* ----- Main body (right) ----- */
-.primary-action__main {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  padding: var(--sp-4) var(--sp-5);
-  gap: var(--sp-3);
-  min-width: 0;
-}
-
-/* Hand-written verb stamp, top-right of the body */
-.primary-action[data-event="board"] .primary-action__main::after { content: "all aboard"; }
-.primary-action[data-event="alight"] .primary-action__main::after { content: "all off"; }
-.primary-action__main::after {
+/* ----- Saving stamp (bouncy, on success) ----- */
+.pas-stamp {
   position: absolute;
-  top: var(--sp-3); right: var(--sp-5);
-  font-family: var(--font-hand);
-  font-size: var(--fs-hand);
-  line-height: 1;
-  color: var(--t-stamp);
-  transform: rotate(-3deg);
-  pointer-events: none;
-  opacity: 0.92;
-}
-
-.primary-action__header,
-.primary-action__footer {
-  display: flex;
-  justify-content: space-between;
+  inset: 0;
+  display: none;
   align-items: center;
-  gap: var(--sp-3);
-}
-
-.primary-action__brand {
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.2em;
+  justify-content: center;
+  z-index: 4;
+  pointer-events: none;
+  font-family: var(--font-hand);
+  font-size: 40px;
   color: var(--t-stamp);
-  text-transform: uppercase;
-  font-weight: 600;
 }
-
-/* The handwritten verb (top-right) is the signature stamp; the generic
-   "ONE WAY" chip would collide with it, so it's hidden on the ticket. */
-.primary-action__class { display: none; }
-
-.primary-action__label {
-  align-self: center;
-  font-family: var(--font-display);
-  font-size: var(--fs-3xl);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  color: var(--t-ink);
+.primary-action[data-state="success"] .pas-stamp {
+  display: flex;
+  animation: stamp-impact 360ms cubic-bezier(.34, 1.56, .64, 1);
 }
-
-.primary-action__route {
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  color: var(--t-ink);
-  font-feature-settings: "tnum" 1;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-}
-
-.primary-action__date {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  color: var(--t-stamp);
-  text-transform: uppercase;
+@keyframes stamp-impact {
+  0%   { opacity: 0; transform: scale(1.4) rotate(-8deg); }
+  40%  { opacity: 0.55; transform: scale(1.12) rotate(-5deg); }
+  70%  { opacity: 1; transform: scale(1.02) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
 }
 
 .primary-action:active {
   transform: scale(0.985) rotate(-0.3deg);
   box-shadow: 0 1px 0 rgba(70, 50, 20, 0.05);
 }
-
-.primary-action[data-state="loading"] {
-  opacity: 0.75;
-  pointer-events: none;
-}
-
-.primary-action[data-state="success"] {
-  border-color: var(--leaf-deep);
-}
-
-.primary-action[data-state="error"] {
-  border-color: var(--danger);
-}
-
-.primary-action[disabled] {
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-/* No spinners (design-system-slow-town-station.md:329 — "loading is
-   waiting"). The save indicator is the spec-approved dot-pulse "···". */
-.primary-action .loading-dots {
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xl);
-  line-height: 1;
-  letter-spacing: 0.06em;
-  color: var(--t-stamp);
-  animation: dot-pulse 1.6s ease-in-out infinite;
-}
+.primary-action[data-state="loading"] { opacity: 0.8; pointer-events: none; }
+.primary-action[data-state="success"] { border-color: var(--leaf-deep); }
+.primary-action[data-state="error"] { border-color: var(--danger); }
+.primary-action[disabled] { opacity: 0.45; pointer-events: none; }
 
 .primary-action__hint {
-  margin: 0;
+  margin: var(--sp-2) 0 0;
   text-align: center;
-  font-family: var(--font-hand);
-  font-size: var(--fs-hand);
-  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
   min-height: 1.2em;
   line-height: 1.1;
 }
@@ -449,31 +428,17 @@
 /* Tickets stay warm-amber at night — only chrome flips */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .primary-action {
-    --t-paper: #E0A040;
-    --t-edge:  #8E5F1A;
-    --t-stamp: #2B2417;
-    --t-ink:   #2B2417;
-    --punch:   #C98A2E;
+    --t-paper: #E0A040; --t-edge: #8E5F1A; --t-stamp: #2B2417; --t-ink: #2B2417; --punch: #C98A2E;
   }
   :root:not([data-theme="light"]) .primary-action[data-color="cool"] {
-    --t-paper: #B85432;
-    --t-edge:  #5C2814;
-    --t-stamp: #2B2417;
-    --punch:   #9E4628;
+    --t-paper: #B85432; --t-edge: #5C2814; --t-stamp: #2B2417; --punch: #9E4628;
   }
 }
 :root[data-theme="dark"] .primary-action {
-  --t-paper: #E0A040;
-  --t-edge:  #8E5F1A;
-  --t-stamp: #2B2417;
-  --t-ink:   #2B2417;
-  --punch:   #C98A2E;
+  --t-paper: #E0A040; --t-edge: #8E5F1A; --t-stamp: #2B2417; --t-ink: #2B2417; --punch: #C98A2E;
 }
 :root[data-theme="dark"] .primary-action[data-color="cool"] {
-  --t-paper: #B85432;
-  --t-edge:  #5C2814;
-  --t-stamp: #2B2417;
-  --punch:   #9E4628;
+  --t-paper: #B85432; --t-edge: #5C2814; --t-stamp: #2B2417; --punch: #9E4628;
 }
 
 /* ---------- Recent list → diary leg rows ---------- */
