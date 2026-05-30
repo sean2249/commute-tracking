@@ -35,6 +35,20 @@ document.querySelectorAll('[data-icon]').forEach((el) => {
   if (ICONS[name]) el.innerHTML = ICONS[name](Number(el.dataset.size) || 20);
 });
 
+// First-launch splash: show once per session, then fade. "Loading is waiting."
+(function splash() {
+  const el = document.getElementById('splash');
+  if (!el) return;
+  let shown = false;
+  try { shown = sessionStorage.getItem('commute.splashShown') === '1'; } catch {}
+  if (shown) { el.remove(); return; }
+  try { sessionStorage.setItem('commute.splashShown', '1'); } catch {}
+  setTimeout(() => {
+    el.classList.add('hide');
+    setTimeout(() => el.remove(), 420);
+  }, 1000);
+})();
+
 function currentBoardDirection() {
   return directionOverride || inferDirectionByTime();
 }
@@ -456,7 +470,14 @@ async function retryWeather(eventId) {
   await refreshRecent();
 }
 
+function recentSkeletons(n) {
+  return Array.from({ length: n }).map(() =>
+    '<li class="pair-row skeleton-row"><span class="skeleton" style="height:14px;width:90%;grid-column:1/-1"></span></li>'
+  ).join('');
+}
+
 async function refreshRecent() {
+  if (recentCache.length === 0) recentList.innerHTML = recentSkeletons(3);
   const { data, error } = await listEvents(20);
   if (error) {
     recentList.innerHTML = `<li class="empty">無法載入紀錄:${escapeHtml(error.message)}</li>`;
