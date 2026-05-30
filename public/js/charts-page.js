@@ -112,15 +112,16 @@ function renderTrend(durations) {
     if (!byDir[d.direction]) return;
     byDir[d.direction].push({ x: d.local_date, y: Number(d.duration_min) });
   });
+  // Strict AM/PM semantics: to_work = sun (--accent), from_work = clay (--pm).
   const accent = cssVar('--accent');
-  const muted = cssVar('--fg-muted');
+  const pm = cssVar('--pm');
   chartInstances.trend?.destroy();
   chartInstances.trend = new Chart(document.getElementById('chart-trend'), {
     type: 'line',
     data: {
       datasets: [
         { label: DIR_LABELS.to_work, data: byDir.to_work, borderColor: accent, backgroundColor: accent, tension: 0.2, pointRadius: 3 },
-        { label: DIR_LABELS.from_work, data: byDir.from_work, borderColor: muted, backgroundColor: muted, tension: 0.2, pointRadius: 3, borderDash: [4, 4] },
+        { label: DIR_LABELS.from_work, data: byDir.from_work, borderColor: pm, backgroundColor: pm, tension: 0.2, pointRadius: 3, borderDash: [4, 4] },
       ],
     },
     options: {
@@ -142,8 +143,9 @@ function renderScatter(boardings) {
     renderEmpty('chart-scatter');
     return;
   }
+  // Strict AM/PM semantics: to_work = sun (--accent), from_work = clay (--pm).
   const accent = cssVar('--accent');
-  const muted = cssVar('--fg-muted');
+  const pm = cssVar('--pm');
   const datasets = { to_work: [], from_work: [] };
   boardings.forEach((b) => {
     const [h, m] = (b.local_time || '00:00').split(':').map(Number);
@@ -156,7 +158,7 @@ function renderScatter(boardings) {
     data: {
       datasets: [
         { label: DIR_LABELS.to_work, data: datasets.to_work, backgroundColor: accent },
-        { label: DIR_LABELS.from_work, data: datasets.from_work, backgroundColor: muted },
+        { label: DIR_LABELS.from_work, data: datasets.from_work, backgroundColor: pm },
       ],
     },
     options: {

@@ -89,7 +89,7 @@ function setIdle() {
 
 function showLoading() {
   primaryBtn.dataset.state = 'loading';
-  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="spinner" aria-label="loading"></span>';
+  primaryBtn.querySelector('.primary-action__icon').innerHTML = '<span class="loading-dots" role="status" aria-label="儲存中">···</span>';
   primaryBtn.querySelector('.primary-action__label').textContent = '';
 }
 
@@ -247,7 +247,7 @@ function renderStrip(payload) {
   if (payload.state === 'empty') {
     strip.dataset.state = 'empty';
     delete strip.dataset.direction;
-    strip.innerHTML = '<div>尚無紀錄。按下方上車鍵開始。</div>';
+    strip.innerHTML = '<img class="bus" src="assets/bus-right-512.png" alt="" aria-hidden="true"><div>尚無紀錄。按下方上車鍵開始。</div>';
     return;
   }
   if (payload.state === 'tracking') {
@@ -414,7 +414,7 @@ function renderPairRow(p) {
   const trash = ICONS.trash ? ICONS.trash(16) : '×';
   const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
   return `
-    <li class="pair-row${rowClass}">
+    <li class="pair-row${rowClass}" data-direction="${p.direction}">
       <span class="mono date">${formatDate(p.local_date)}</span>
       <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
       <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>
