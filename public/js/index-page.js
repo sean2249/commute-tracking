@@ -6,6 +6,7 @@ import { pairEvents } from './pair.js';
 import { getOpenBoard, setOpenBoard, clearOpenBoard, reconcileWithServer } from './openBoard.js';
 import { init as initReminder, cancel as cancelReminder, schedule as scheduleReminder, ensureNotificationPermission } from './reminder.js';
 import { routeFor } from './settings.js';
+import { initPullRefresh } from './pull-refresh.js';
 
 const strip = document.getElementById('status-strip');
 const recentList = document.getElementById('recent-list');
@@ -614,4 +615,5 @@ initReminder({
     refreshRecent();
   },
 });
+initPullRefresh(() => refreshRecent());
 refreshRecent();

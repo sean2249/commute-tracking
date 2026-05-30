@@ -20,6 +20,7 @@ html, body { transition: background-color 0.7s ease, color 0.7s ease; }
 body {
   min-height: 100vh;
   min-height: 100dvh;
+  overscroll-behavior-y: contain;
   /* Pastoral page: cream paper with two soft riso overprints + hairline texture */
   background-color: var(--bg);
   background-image:

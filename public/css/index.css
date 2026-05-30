@@ -623,3 +623,26 @@
 .splash-cn { font-family: var(--font-body); font-size: var(--fs-base); color: var(--ink-muted); letter-spacing: 0.12em; margin-top: var(--sp-1); }
 .splash-hand { font-family: var(--font-hand); font-size: var(--fs-hand); color: var(--leaf-deep); }
 @media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
+
+/* ---------- Pull-to-refresh (bus rolls in from above) ---------- */
+.pull-indicator {
+  position: fixed;
+  top: -60px; left: 0; right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  z-index: 40;
+  pointer-events: none;
+}
+.pull-indicator img { width: 50px; height: auto; filter: drop-shadow(0 2px 2px rgba(80, 55, 20, 0.25)); }
+.pull-indicator .pull-dots {
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  color: var(--ink-muted);
+  opacity: 0;
+}
+.pull-indicator.ready .pull-dots { opacity: 1; }
+.pull-indicator.refreshing .pull-dots { opacity: 1; animation: dot-pulse 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pull-indicator.refreshing .pull-dots { animation: none; } }

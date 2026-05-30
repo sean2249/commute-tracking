@@ -29,6 +29,7 @@ const SHELL = [
   './js/reminder.js',
   './js/push.js',
   './js/settings.js',
+  './js/pull-refresh.js',
   './js/index-page.js',
   './js/log-page.js',
   './js/charts-page.js',
