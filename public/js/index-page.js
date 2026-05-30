@@ -506,13 +506,13 @@ async function refreshRecent() {
   }
 
   if (recentCache.length === 0) {
-    recentList.innerHTML = '<li class="empty">尚無紀錄。</li>';
+    recentList.innerHTML = '<li class="empty">還沒有票根。今天的第一班,就從下方開始。</li>';
     return;
   }
 
   const pairs = pairEvents(recentCache).slice(0, 5);
   if (pairs.length === 0) {
-    recentList.innerHTML = '<li class="empty">尚無紀錄。</li>';
+    recentList.innerHTML = '<li class="empty">還沒有票根。今天的第一班,就從下方開始。</li>';
     return;
   }
 
@@ -575,6 +575,8 @@ async function handlePairDelete(ev, btn) {
   }
   btn.setAttribute('disabled', '');
   btn.innerHTML = '<span>刪除中…</span>';
+  const row = btn.closest('li');
+  if (row) row.classList.add('tearing'); // torn ticket
   const boardId = btn.dataset.boardId;
   const alightId = btn.dataset.alightId;
   const ops = [];

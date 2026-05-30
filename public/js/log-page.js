@@ -58,7 +58,7 @@ function render() {
     listEl.innerHTML = `
       <li class="empty-state">
         <div class="icon-lg">${ICONS.list(48)}</div>
-        <div>${allEvents.length === 0 ? '尚無紀錄。' : '此篩選下無資料。'}</div>
+        <div>${allEvents.length === 0 ? '票根簿還是空的。回首頁紀錄第一班車。' : '這個篩選下沒有票根。'}</div>
         ${allEvents.length === 0 ? '<a href="index.html" class="btn btn-primary">回首頁紀錄</a>' : ''}
       </li>`;
     return;
@@ -143,6 +143,8 @@ async function handlePairDelete(ev, btn) {
   }
   btn.setAttribute('disabled', '');
   btn.innerHTML = '<span>刪除中…</span>';
+  const leg = btn.closest('.leg') || btn.closest('li');
+  if (leg) leg.classList.add('tearing'); // torn ticket
   const boardId = btn.dataset.boardId;
   const alightId = btn.dataset.alightId;
   const ops = [];
