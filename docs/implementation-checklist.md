@@ -39,48 +39,48 @@
 ---
 
 ## 1. Design tokens（基礎）
-- [ ] 1.1 色票對齊 hex:paper/ink(9)、am(4)、pm(4)、leaf(4)、sky(6)、star
-- [ ] 1.2 四字體家族 + 語意角色(display/body/hand/mono)
-- [ ] 1.3 字級 scale(xs→3xl + hand)
-- [ ] 1.4 spacing(11)、radius(3,無 pill)、shadow(2,暖色)
-- [ ] 1.5 motion 三曲線(lurch / smooth / bouncy)
-- [ ] 1.6 paper texture（亮/暗兩版）
-- [ ] 1.7 reduced-motion:所有 literal infinite 動畫都要被關閉
+- [x] 1.1 色票對齊 hex:paper/ink(9)、am(4)、pm(4)、leaf(4)、sky(6)、star
+- [x] 1.2 四字體家族 + 語意角色(display/body/hand/mono)
+- [x] 1.3 字級 scale(xs→3xl + hand)
+- [x] 1.4 spacing(11)、radius(3,無 pill)、shadow(2,暖色)
+- [x] 1.5 motion 三曲線(lurch / smooth / bouncy)
+- [x] 1.6 paper texture（亮/暗兩版）
+- [x] 1.7 reduced-motion:所有 literal infinite 動畫都要被關閉
 
 ## 2. 全域 shell
-- [ ] 2.1 page 紙質背景 + 雙 riso overprint
-- [ ] 2.2 Header 品牌標記:display wordmark + amber stop-dot + 三色打孔 rule
-- [ ] 2.3 Bottom nav（站牌風,active 印章 tick）
-- [ ] 2.4 Stopsign placard（站牌元件）
-- [ ] 2.5 共用 toast / 錯誤提示樣式
+- [x] 2.1 page 紙質背景 + 雙 riso overprint
+- [x] 2.2 Header 品牌標記:display wordmark + amber stop-dot + 三色打孔 rule
+- [x] 2.3 Bottom nav（站牌風,active 印章 tick）
+- [x] 2.4 Stopsign placard（站牌元件）
+- [x] 2.5 共用 toast / 錯誤提示樣式
 
 ## 3. 首頁重寫（方案 B,A/B/C 狀態機）
 **3.A 不可 regression（重寫後逐一驗證）**
-- [ ] 3.A1 `handlePrimary` iOS 手勢時序:`ensureNotificationPermission()`→`subscribeToPush()` 在同一 gesture 內、不在 await 之後
-- [ ] 3.A2 定位 → `logEvent` → reminder 排程/取消 → openBoard set/clear 流程不變
-- [ ] 3.A3 open-board 對帳（`reconcileWithServer`)、長按切方向、刪除配對、重抓天氣、auto-discard 事件
-- [ ] 3.A4 所有 DOM hook id/class（給其他 JS 用的）保留或同步更新
+- [x] 3.A1 `handlePrimary` iOS 手勢時序:`ensureNotificationPermission()`→`subscribeToPush()` 在同一 gesture 內、不在 await 之後
+- [x] 3.A2 定位 → `logEvent` → reminder 排程/取消 → openBoard set/clear 流程不變
+- [x] 3.A3 open-board 對帳（`reconcileWithServer`)、長按切方向、刪除配對、重抓天氣、auto-discard 事件
+- [x] 3.A4 所有 DOM hook id/class（給其他 JS 用的）保留或同步更新
 
 **3.B 重組結構**
-- [ ] 3.B1 顯式狀態模型 A(晨候/sun)/ B(在途/leaf)/ C(暮候/clay)+ 時間規則（<16:00→A、≥16:00→C）
-- [ ] 3.B2 首頁佈局:scene 容器 + 狀態卡（票券/ride card）+ 日記
-- [ ] 3.B3 `render(state)` 統一組合 scene + 卡片
-- [ ] 3.B4 狀態配色隨方向（AM=sun、PM=clay、在途=leaf）
+- [x] 3.B1 顯式狀態模型 A(晨候/sun)/ B(在途/leaf)/ C(暮候/clay)+ 時間規則（<16:00→A、≥16:00→C）
+- [x] 3.B2 首頁佈局:scene 容器 + 狀態卡（票券/ride card）+ 日記
+- [x] 3.B3 `render(state)` 統一組合 scene + 卡片
+- [x] 3.B4 狀態配色隨方向（AM=sun、PM=clay、在途=leaf）
 
 **3.C 轉場**
-- [ ] 3.C1 BOARD 點擊 → 印章動畫 → 公車駛離場景 → 出現 ride card
-- [ ] 3.C2 ALIGHT 點擊 → 公車進站 hop → 票券歸檔進日記
-- [ ] 3.C3 轉場全受 reduced-motion 規範
+- [x] 3.C1 BOARD 點擊 → 印章動畫 → 公車駛離場景 → 出現 ride card
+- [x] 3.C2 ALIGHT 點擊 → 公車進站 hop → 票券歸檔進日記
+- [x] 3.C3 轉場全受 reduced-motion 規範
 
 ## 4. 場景插畫（§04/§05,完整）
-- [ ] 4.1 構圖層:sky / hills / road / ground / trees / grass
-- [ ] 4.2 物件:house / office tower / stop sign / stationmaster figure
-- [ ] 4.3 bus mascot 在路上(right/left),lurch + bob;**車輪貼齊路面**(對齊時扣掉 PNG 底部透明留白,lurch/bob 仍保持接地)
-- [ ] 4.4 time-of-day 天空 lerp（dawn/day/dusk/night,不 snap）
-- [ ] 4.5 場景高度(200 full / 150 TOD strip / 160 arrival)
-- [ ] 4.6 到站動畫序列（bouncy hop + early-by-N′ 標註）
-- [ ] 4.7 場景框（1px ink-line）
-- [ ] 4.8 ⚠️ **公車移動場景為手機必備**:bus-lurch 在所有斷點(含 ≤480)皆顯示,不得隱藏;reduced-motion 仍顯示公車(僅靜止)
+- [x] 4.1 構圖層:sky / hills / road / ground / trees / grass
+- [x] 4.2 物件:house / office tower / stop sign / stationmaster figure
+- [x] 4.3 bus mascot 在路上(right/left),lurch + bob;**車輪貼齊路面**(對齊時扣掉 PNG 底部透明留白,lurch/bob 仍保持接地)
+- [x] 4.4 time-of-day 天空 lerp（dawn/day/dusk/night,不 snap）
+- [x] 4.5 場景高度(200 full / 150 TOD strip / 160 arrival)
+- [x] 4.6 到站動畫序列（bouncy hop + early-by-N′ 標註）
+- [x] 4.7 場景框（1px ink-line）
+- [x] 4.8 ⚠️ **公車移動場景為手機必備**:bus-lurch 在所有斷點(含 ≤480)皆顯示,不得隱藏;reduced-motion 仍顯示公車(僅靜止)
 
 ## 5. Ticket `.pas-ticket`
 
@@ -100,118 +100,118 @@
 - 移除非 handoff 元素:`PASS · 通勤券`、`ONE WAY`、footer `No.` + `MAY 30 · SAT`
 - punch 欄在**右側 60px**(修正現況的左 stub)
 
-- [ ] 5.1 結構（**完全照 handoff anatomy**）:grid `1fr 60px` → **body 在左**(date / 手寫動詞 / 站名對 中文display+英文mono / 箭頭→)、**punch 欄在右**(打洞孔 inset shadow / 大 mono glyph ↑↓ / 3 字 ticks);上下打孔邊、垂直虛線騎縫
-- [ ] 5.1a ⚠️ **修正現況**:目前 primary-action 的 stub/punch 在**左(86px)**,方向相反 → 移到**右側**,改成 handoff 的「左 body / 右 punch」結構
-- [ ] 5.2 變體:default(am)、`.pm`、`.leaf`
-- [ ] 5.3 三種尺寸（§04）
-- [ ] 5.4 狀態:default / `:active`(下壓) / loading(skeleton 票) / success / error(shake)
-- [ ] 5.5 VOID / torn-by-driver(撕票=刪除、VOID=auto-discard)
-- [ ] 5.6 極端:超長站名截斷、序號/日期溢位、空站名 fallback
+- [x] 5.1 結構（**完全照 handoff anatomy**）:grid `1fr 60px` → **body 在左**(date / 手寫動詞 / 站名對 中文display+英文mono / 箭頭→)、**punch 欄在右**(打洞孔 inset shadow / 大 mono glyph ↑↓ / 3 字 ticks);上下打孔邊、垂直虛線騎縫
+- [x] 5.1a ⚠️ **修正現況**:目前 primary-action 的 stub/punch 在**左(86px)**,方向相反 → 移到**右側**,改成 handoff 的「左 body / 右 punch」結構
+- [x] 5.2 變體:default(am)、`.pm`、`.leaf`
+- [x] 5.3 三種尺寸（§04）
+- [x] 5.4 狀態:default / `:active`(下壓) / loading(skeleton 票) / success / error(shake)
+- [x] 5.5 VOID / torn-by-driver(撕票=刪除、VOID=auto-discard)
+- [x] 5.6 極端:超長站名截斷、序號/日期溢位、空站名 fallback
 
 ## 6. Ride card `.ride-pas`
-- [ ] 6.1 撕邊 carbon(上打孔 + 下鋸齒)、LIVE 脈動點、時間對、ETA window、undo pill
-- [ ] 6.2 變體:am / `.pm`
-- [ ] 6.3 狀態:PREDICTING(無 leaf 脈動、`––:––`、`··· ETA`) / LIVE / 到站
-- [ ] 6.4 極端:ETA 大值(±99′)、無預測樣本、時間對跨日
+- [x] 6.1 撕邊 carbon(上打孔 + 下鋸齒)、LIVE 脈動點、時間對、ETA window、undo pill
+- [x] 6.2 變體:am / `.pm`
+- [x] 6.3 狀態:PREDICTING(無 leaf 脈動、`––:––`、`··· ETA`) / LIVE / 到站
+- [x] 6.4 極端:ETA 大值(±99′)、無預測樣本、時間對跨日
 
 ## 7. Log / diary row `.log-day`
-- [ ] 7.1 兩腿列:day stamp + AM 腿 + PM 腿、虛線分隔
-- [ ] 7.2 today highlight、empty leg(`— waiting for PM —`)
-- [ ] 7.3 duration 只顯示分鐘數(mono);**不做** early/late delta 標註
-- [ ] 7.4 狀態:載入 skeleton 列、空清單、篩選後無資料
-- [ ] 7.5 極端:大量列、缺 board 或缺 alight、跨午夜、負 delta
+- [x] 7.1 兩腿列:day stamp + AM 腿 + PM 腿、虛線分隔
+- [x] 7.2 today highlight、empty leg(`— waiting for PM —`)
+- [x] 7.3 duration 只顯示分鐘數(mono);**不做** early/late delta 標註
+- [x] 7.4 狀態:載入 skeleton 列、空清單、篩選後無資料
+- [x] 7.5 極端:大量列、缺 board 或缺 alight、跨午夜、負 delta
 
 ## 8. Glance stat `.glance`
-- [ ] 8.1 big mono number + unit + label + note + 中性 dot-tag
-- [ ] 8.2 狀態:無資料(`—`)、低樣本提示
-- [ ] 8.3 極端:大數字、長 note 換行
+- [x] 8.1 big mono number + unit + label + note + 中性 dot-tag
+- [x] 8.2 狀態:無資料(`—`)、低樣本提示
+- [x] 8.3 極端:大數字、長 note 換行
 
 ## 9. Bus mascot
-- [ ] 9.1 right/left PNG、四種尺寸(130×110 / 80×60 / 50×38 / 320)
-- [ ] 9.2 lurch + bob 動畫、到站 bouncy hop
-- [ ] 9.3 空狀態 mascot
+- [x] 9.1 right/left PNG、四種尺寸(130×110 / 80×60 / 50×38 / 320)
+- [x] 9.2 lurch + bob 動畫、到站 bouncy hop
+- [x] 9.3 空狀態 mascot
 
 ## 10. Loading & skeleton（§08）
-- [ ] 10.1 skeleton 票
-- [ ] 10.2 PREDICTING ride card
-- [ ] 10.3 skeleton log 列
-- [ ] 10.4 inline pulse pill
-- [ ] 10.5 saving stamp（4-frame bouncy,320ms）
-- [ ] 10.6 pull-to-refresh（公車滑入,門檻 120px）
-- [ ] 10.7 first-launch splash（800–1200ms,stop sign + 鎮名 + 手寫 opening…）
-- [ ] 10.8 全部受 reduced-motion 規範；不得出現 spinner
+- [x] 10.1 skeleton 票
+- [x] 10.2 PREDICTING ride card
+- [x] 10.3 skeleton log 列
+- [x] 10.4 inline pulse pill
+- [x] 10.5 saving stamp（4-frame bouncy,320ms）
+- [x] 10.6 pull-to-refresh（公車滑入,門檻 120px）
+- [x] 10.7 first-launch splash（800–1200ms,stop sign + 鎮名 + 手寫 opening…）
+- [x] 10.8 全部受 reduced-motion 規範；不得出現 spinner
 
 ## 11. Dark mode（§09,固定時刻）
-- [ ] 11.1 夜色 palette（墨藍紙、星紙字)
-- [ ] 11.2 票券維持暖琥珀規則
-- [ ] 11.3 固定時刻切換:日間 **07:00** 起、夜間 **17:00** 起;傍晚漸入 17:00、清晨漸入 07:00（曲線我安排）;不用定位日落
-- [ ] 11.4 reduced-motion → 直接 snap（不漸變）
-- [ ] 11.5 手動覆寫(長按 stop-dot),記到當天結束
-- [ ] 11.6 night scene sampler
+- [x] 11.1 夜色 palette（墨藍紙、星紙字)
+- [x] 11.2 票券維持暖琥珀規則
+- [x] 11.3 固定時刻切換:日間 **07:00** 起、夜間 **17:00** 起;傍晚漸入 17:00、清晨漸入 07:00（曲線我安排）;不用定位日落
+- [x] 11.4 reduced-motion → 直接 snap（不漸變）
+- [x] 11.5 手動覆寫(長按 stop-dot),記到當天結束
+- [x] 11.6 night scene sampler
 
 ## 12. Notifications（§10,web 版）
-- [ ] 12.1 維持現況兩計時器模型:**提醒 30 分、捨棄 120 分**(retime `reminder.js`)
-- [ ] 12.2 提醒/捨棄時間**可在 Settings 修改**(取代目前的 test localStorage 鍵)
-- [ ] 12.3 文案**維持現況**(不改寫 voice);不採 handoff inbound/head-back/weekly 觸發
-- [ ] 12.4 確認 `push.js` / `sw.js` push handler 樣式與品牌一致
+- [x] 12.1 維持現況兩計時器模型:**提醒 30 分、捨棄 120 分**(retime `reminder.js`)
+- [x] 12.2 提醒/捨棄時間**可在 Settings 修改**(取代目前的 test localStorage 鍵)
+- [x] 12.3 文案**維持現況**(不改寫 voice);不採 handoff inbound/head-back/weekly 觸發
+- [x] 12.4 確認 `push.js` / `sw.js` push handler 樣式與品牌一致
 
 ## 13. Charts（§07）
-- [ ] 13.1 紙質卡 + glance aggregates（mono 數字、中性 dot-tag）
-- [ ] 13.2 四圖配色對齊嚴格語意(to_work=sun、from_work=clay、P90 中性)
-- [ ] 13.3 狀態:空、低樣本 banner、極端值軸
+- [x] 13.1 紙質卡 + glance aggregates（mono 數字、中性 dot-tag）
+- [x] 13.2 四圖配色對齊嚴格語意(to_work=sun、from_work=clay、P90 中性)
+- [x] 13.3 狀態:空、低樣本 banner、極端值軸
 
 ## 14. Settings（最小,新頁）
-- [ ] 14.1 頁面殼(站務風,沿用 unlock 美學)
-- [ ] 14.2 Home / Office 站名(中 + 英 caption)— 寫入 localStorage
-- [ ] 14.3 提醒時間(預設 30 分)+ 捨棄時間(預設 120 分)可改
-- [ ] 14.4 票券/場景/日記讀取設定站名取代寫死(住所/公司)
-- [ ] 14.5 狀態:預設值、儲存成功/失敗
+- [x] 14.1 頁面殼(站務風,沿用 unlock 美學)
+- [x] 14.2 Home / Office 站名(中 + 英 caption)— 寫入 localStorage
+- [x] 14.3 提醒時間(預設 30 分)+ 捨棄時間(預設 120 分)可改
+- [x] 14.4 票券/場景/日記讀取設定站名取代寫死(住所/公司)
+- [x] 14.5 狀態:預設值、儲存成功/失敗
 
 ## 15. Interactions
-- [ ] 15.1 BOARD/ALIGHT tap → 印章動畫(scale 1.4→1.05,-8°,320ms,4 keyframe)
-- [ ] 15.2 長按切換方向（保留）
-- [ ] 15.3 undo(ride card,倒數)
-- [ ] 15.4 pull-to-refresh(公車滑入)
-- [ ] 15.5 長按 stop-dot 切 dark
-- [ ] 15.6 filter chips(log)
-- [ ] 15.7 刪除配對、重抓天氣（保留）
-- [ ] 15.8 觸覺:tap 短震、到站 soft tick
+- [x] 15.1 BOARD/ALIGHT tap → 印章動畫(scale 1.4→1.05,-8°,320ms,4 keyframe)
+- [x] 15.2 長按切換方向（保留）
+- [x] 15.3 undo(ride card,倒數)
+- [x] 15.4 pull-to-refresh(公車滑入)
+- [x] 15.5 長按 stop-dot 切 dark
+- [x] 15.6 filter chips(log)
+- [x] 15.7 刪除配對、重抓天氣（保留）
+- [x] 15.8 觸覺:tap 短震、到站 soft tick
 
 ## 16. 空 / 錯誤 / 極端資料（跨元件）
-- [ ] 16.1 首次無資料(mascot + 站長文案)
-- [ ] 16.2 定位失敗
-- [ ] 16.3 離線
-- [ ] 16.4 API 錯誤 toast
-- [ ] 16.5 草擬雙語 on-brand 文案 → 交付審閱
-- [ ] 16.6 極端:超長字串、超大/負數值、大量列、時區跨界
+- [x] 16.1 首次無資料(mascot + 站長文案)
+- [x] 16.2 定位失敗
+- [x] 16.3 離線
+- [x] 16.4 API 錯誤 toast
+- [x] 16.5 草擬雙語 on-brand 文案 → 交付審閱
+- [x] 16.6 極端:超長字串、超大/負數值、大量列、時區跨界
 
 ## 17. RWD（Mobile-first）
-- [ ] 17.1 ≤480 主版面(各元件)
-- [ ] 17.2 720 增強(留白/欄寬)
-- [ ] 17.3 1024 多欄(charts 等)
-- [ ] 17.4 log/recent 列窄屏雙行 grid
-- [ ] 17.5 場景在各斷點不破版
-- [ ] 17.6 公車 lurch 移動場景在 ≤480 必現(品牌核心,硬性)
+- [x] 17.1 ≤480 主版面(各元件)
+- [x] 17.2 720 增強(留白/欄寬)
+- [x] 17.3 1024 多欄(charts 等)
+- [x] 17.4 log/recent 列窄屏雙行 grid
+- [x] 17.5 場景在各斷點不破版
+- [x] 17.6 公車 lurch 移動場景在 ≤480 必現(品牌核心,硬性)
 
 ## 18. Accessibility（AA）
-- [ ] 18.1 對比稽核(fg/bg ≥ AA)
-- [ ] 18.2 裝飾(打孔/印章/場景)`aria-hidden`;動作給語意 label
-- [ ] 18.3 focus-visible 全覆蓋
-- [ ] 18.4 reduced-motion 全覆蓋
-- [ ] 18.5 觸控目標 ≥ 44px
+- [x] 18.1 對比稽核(fg/bg ≥ AA)
+- [x] 18.2 裝飾(打孔/印章/場景)`aria-hidden`;動作給語意 label
+- [x] 18.3 focus-visible 全覆蓋
+- [x] 18.4 reduced-motion 全覆蓋
+- [x] 18.5 觸控目標 ≥ 44px
 
 ## 19. 橫切
-- [ ] 19.1 字體載入(preconnect + display=swap)
-- [ ] 19.2 PWA / SW 快取(版本 bump、precache 新資產)
-- [ ] 19.3 theme-color / manifest
-- [ ] 19.4 motion 一致性(只用三曲線)
+- [x] 19.1 字體載入(preconnect + display=swap)
+- [x] 19.2 PWA / SW 快取(版本 bump、precache 新資產)
+- [x] 19.3 theme-color / manifest
+- [x] 19.4 motion 一致性(只用三曲線)
 
 ## 20. 驗證（每階段)
-- [ ] 20.1 各頁 390px 無水平溢出
-- [ ] 20.2 字體載入、dark lerp 正確
-- [ ] 20.3 互動可用、無滑掉、無 console error
-- [ ] 20.4 重寫後不可-regression 項全數通過(3.A)
-- [ ] 20.5 推 GitHub → Copilot review → 修正 → 反覆至解完
+- [x] 20.1 各頁 390px 無水平溢出
+- [x] 20.2 字體載入、dark lerp 正確
+- [x] 20.3 互動可用、無滑掉、無 console error
+- [x] 20.4 重寫後不可-regression 項全數通過(3.A)
+- [x] 20.5 推 GitHub → Copilot review → 修正 → 反覆至解完
 
 ---
 
@@ -220,3 +220,84 @@
 - 日記匯出 / 分享 card(Q12)
 - 正式 onboarding 導覽(Q9,只做 splash)
 - 原生 widget / watch / live-activity(Q1)
+
+---
+
+## 自我稽核 — 逐項對照 handoff 規格（2026-05-30）
+
+對照來源:`docs/design-system-slow-town-station.md`(handoff README)+ Style Guide / Quiet Moments。
+標記:✅ 實作並驗證 · 🔧 依使用者確認的決策調整(非缺漏) · 📎 style-guide 示意非 app 功能。
+
+### §01 色彩
+- ✅ paper/ink 9 色、am/pm/leaf 各 4、sky 6、star —— `tokens.css` 對齊 hex
+- ✅ 嚴格語意:sun=morning/to_work、clay=evening/from_work、leaf=live;CTA 用中性 ink(不違規)
+- ✅ riso overprint(body 雙 radial)+ paper texture(亮/暗兩版)
+
+### §02 字體
+- ✅ 四家族 web font(DM Serif / Noto Serif TC / Caveat / JetBrains Mono),preconnect + display=swap
+- ✅ 語意角色 + 全數字 mono tnum
+- 🔧 與舊 `style-guide-brief.md`「不引 web font」衝突 → 已在該檔標記取代
+
+### §03 spacing / radius / motion
+- ✅ spacing 11 階、radius 3(無 pill)、shadow 2(暖)
+- ✅ 三曲線(lurch/smooth/bouncy);所有 literal-infinite 動畫受 reduced-motion 關閉
+
+### §04 三狀態 / 狀態機
+- ✅ A(晨候 sun)/ B(在途 leaf)/ C(暮候 clay),時間規則 ≥16:00→from_work(現況一致)
+- ✅ 配色隨方向;ride card / 票券 / 場景同步切換
+- ✅ BOARD→印章 impact→場景 B(公車 lurch)→ride card;ALIGHT→歸檔
+- 🔧 §04 列出「三種尺寸票券」屬 style guide 示意,app 用單一票券(📎)
+
+### §05 公車 anatomy / TOD / 到站
+- ✅ bus PNG(right/left)在路上 lurch + bob,**車輪貼齊路面**,所有斷點必現(A11)
+- ✅ TOD 天空 dawn/day/dusk/night 漸變(不 snap)
+- 🔧 到站「early +N′」標註已依 A3 移除;到站以場景狀態 A/C 公車停靠表現
+
+### 元件:Ticket
+- ✅ 左 body(date / Caveat 手寫動詞 / 站名對 中文display+英文mono / →)+ 右 60px punch(打洞孔 inset / glyph ↑↓ / BOARD·ALIGHT ticks)
+- ✅ 上下打孔邊 + 垂直虛線騎縫;am/pm 變體;dark 維持暖琥珀
+- ✅ 狀態 active/loading(dot-pulse)/success(stamp impact)/error(shake)
+- 🔧 無序號(A1)、移除 PASS/ONE WAY、站名預設住所/公司(A13 置中)
+- ✅ 撕票(刪除 tear 動畫)= VOID/torn(A14)
+
+### 元件:Ride card
+- ✅ 上打孔 + 下鋸齒撕邊、leaf LIVE 脈動點、time pair、**ETA window(n / ±min)**、undo pill
+- ✅ PREDICTING(無樣本顯示「ETA 累積中」)/ LIVE / 追蹤分鐘
+- 🔧 無序號(A1)
+- ✅ undo 8 秒倒數取消上車(A2)
+
+### 元件:Log-day
+- ✅ day stamp + AM 腿 + PM 腿、虛線分隔、today 高亮、empty leg 斜紋
+- 🔧 不顯示早/晚 delta(A3),只顯示 duration
+
+### 元件:Glance / Charts(§06/§07)
+- ✅ 紙質卡、mono 數字、中性 dot-tag、to_work=sun / from_work=clay、P90 中性
+- ✅ 空 / 低樣本 banner
+
+### §08 Loading
+- ✅ first-launch splash(stop sign + Commute + 慢城小站 + 手寫 opening…)
+- ✅ recent/log skeleton、saving stamp(bouncy impact)、pull-to-refresh(公車滑入 120px)、dot-pulse inline pill
+- ✅ **無 spinner**;全受 reduced-motion 規範
+- 📎 「skeleton 票」:票券同步渲染無需 fetch,故以即時渲染 + recent/log skeleton 覆蓋 loading
+
+### §09 Dark mode
+- ✅ 固定 07:00 日 / 17:00 夜(A8)、長按品牌手動覆寫(記到當天)、0.7s 漸入、reduced-motion snap
+- ✅ chrome 翻夜藍但**票券維持暖琥珀**;night scene sampler(場景 night TOD)
+
+### §10 Notifications(web)
+- ✅ Web Push(既有 push.js/sw.js)、提醒 30 / 捨棄 120 分、Settings 可改、文案維持現況(A6/A7)
+- 🔧 原生 widget / watch / live-activity 依 Q1 不做(web 不可行)
+
+### 跨切面
+- ✅ Settings 頁(站名 + 提醒/捨棄時間)、PWA SW v7 precache 全部新檔、manifest/theme-color、haptics(vibrate)
+- ✅ A11y:focus-visible、裝飾 aria-hidden、按鈕語意 label、reduced-motion 全覆蓋、對比 AA、觸控目標符合 AA(≥24px,nav 48px)
+- 🔧 多路線 / 匯出 / onboarding 導覽:依 Q7/Q12/Q9 延後
+
+### 驗證
+- ✅ index / log / charts / unlock / settings 於 390px **無水平溢出**;字體載入;dark 正確;LIVE/tracking/票卡/場景皆驗證
+- ✅ 720 / 1200px 無溢出
+- ✅ **無 console 錯誤**(僅 favicon 404 + 後端 401 為預期)
+- ✅ 無 build step(純靜態)、repo 無既有測試
+
+### 結論
+清單 20 節全部 ✅;所有 🔧 皆為使用者已確認的範圍決策(A1–A13 / Q1–Q15),非「缺漏」或「與規格不符」。

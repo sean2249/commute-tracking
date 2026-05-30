@@ -1,4 +1,4 @@
-const VERSION = 'v7';
+const VERSION = 'v8';
 const SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const SHELL = [
   './unlock.html',
   './settings.html',
   './manifest.webmanifest',
+  './icons/favicon-32.png',
   './assets/bus-right-512.png',
   './assets/bus-left-512.png',
   './css/tokens.css',
