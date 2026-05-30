@@ -1,18 +1,22 @@
-const VERSION = 'v6';
+const VERSION = 'v7';
 const SHELL = [
   './',
   './index.html',
   './log.html',
   './charts.html',
   './unlock.html',
+  './settings.html',
   './manifest.webmanifest',
   './assets/bus-right-512.png',
+  './assets/bus-left-512.png',
   './css/tokens.css',
   './css/base.css',
+  './css/scene.css',
   './css/index.css',
   './css/log.css',
   './css/charts.css',
   './css/unlock.css',
+  './css/settings.css',
   './js/config.js',
   './js/api.js',
   './js/weather.js',
@@ -23,10 +27,12 @@ const SHELL = [
   './js/openBoard.js',
   './js/reminder.js',
   './js/push.js',
+  './js/settings.js',
   './js/index-page.js',
   './js/log-page.js',
   './js/charts-page.js',
   './js/unlock-page.js',
+  './js/settings-page.js',
 ];
 
 self.addEventListener('install', (e) => {

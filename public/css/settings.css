@@ -1,0 +1,111 @@
+/* ============================================================
+   Settings — stationmaster's desk. Paper forms, ink labels.
+   ============================================================ */
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.set-group {
+  border: 1px solid var(--ink-line);
+  border-radius: var(--r-sm);
+  background: var(--paper-light);
+  background-image: var(--paper-texture);
+  padding: var(--sp-4) var(--sp-4) var(--sp-5);
+  margin: 0;
+}
+
+.set-group legend {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0 var(--sp-2);
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.set-row label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.set-row input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--ink-line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+}
+.set-row input[type="number"] { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
+.set-row input:focus-visible {
+  outline: none;
+  border-color: var(--am-deep);
+  box-shadow: 0 0 0 2px rgba(217, 164, 65, 0.3);
+}
+
+.set-note {
+  margin: var(--sp-3) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+/* Neutral ink CTA — settings save is not a morning/to_work action */
+.set-save {
+  height: 50px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper-light);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.06em;
+  transition: background var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+.set-save:active { background: var(--ink-soft); transform: scale(0.98); }
+
+.set-status {
+  min-height: 20px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--leaf-deep);
+}
+
+.set-link {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 380px) {
+  .set-row { grid-template-columns: 1fr; }
+}
