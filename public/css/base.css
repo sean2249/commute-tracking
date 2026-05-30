@@ -12,6 +12,11 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* Day/night crossfade (the "lerp" into 07:00 / 17:00). Snaps under
+   reduced-motion. Component surfaces inherit via their own bg tokens. */
+html, body { transition: background-color 0.7s ease, color 0.7s ease; }
+@media (prefers-reduced-motion: reduce) { html, body { transition: none; } }
+
 body {
   min-height: 100vh;
   min-height: 100dvh;

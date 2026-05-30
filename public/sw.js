@@ -22,6 +22,7 @@ const SHELL = [
   './js/weather.js',
   './js/time.js',
   './js/pwa.js',
+  './js/theme.js',
   './js/icons.js',
   './js/pair.js',
   './js/openBoard.js',
