@@ -1,8 +1,7 @@
 import { deleteEvent } from './api.js';
 import { getOpenBoard, clearOpenBoard, markNotified } from './openBoard.js';
+import { getRemindMin, getDiscardMin } from './settings.js';
 
-const REMIND_MS_DEFAULT = 40 * 60 * 1000;
-const DISCARD_MS_DEFAULT = 120 * 60 * 1000;
 const SAFETY_MAX_MS = 24 * 60 * 60 * 1000;
 
 function readOverride(key, fallback) {
@@ -14,8 +13,10 @@ function readOverride(key, fallback) {
   }
 }
 
-function remindMs() { return readOverride('commute.testReminderMs', REMIND_MS_DEFAULT); }
-function discardMs() { return readOverride('commute.testDiscardMs', DISCARD_MS_DEFAULT); }
+// Configurable in Settings (defaults 30 min remind / 120 min discard).
+// The test* keys remain as fast-path overrides for development.
+function remindMs() { return readOverride('commute.testReminderMs', getRemindMin() * 60 * 1000); }
+function discardMs() { return readOverride('commute.testDiscardMs', getDiscardMin() * 60 * 1000); }
 
 let remindTimer = null;
 let discardTimer = null;
@@ -54,7 +55,8 @@ async function getSwRegistration(timeoutMs = 2000) {
 async function showReminderNotification(ob) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
   const title = '別忘了按下車';
-  const body = ob.direction === 'to_work' ? '上班的「上車」已記錄 40 分鐘了。' : '下班的「上車」已記錄 40 分鐘了。';
+  const mins = getRemindMin();
+  const body = `${ob.direction === 'to_work' ? '上班' : '下班'}的「上車」已記錄 ${mins} 分鐘了。`;
   const opts = { body, tag: `commute-remind-${ob.id}`, renotify: true, badge: 'icons/icon-180.png', icon: 'icons/icon-180.png' };
   const reg = await getSwRegistration();
   if (reg) {

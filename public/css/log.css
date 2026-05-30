@@ -1,5 +1,6 @@
 /* ============================================================
-   Log — the commute diary. Filter chips + paired-day leg rows.
+   Log — the commute diary. Filter chips + paired-day log rows
+   (day stamp + AM leg + PM leg).
    ============================================================ */
 
 .filter-chips {
@@ -39,11 +40,9 @@
   flex-shrink: 0;
   transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
-
 .chip:active { transform: scale(0.97); }
 
-/* Neutral selected treatment for generic filters (status/weather). Only the
-   direction chips carry semantic color — sun for to_work, clay for from_work. */
+/* Neutral selected for generic filters; direction chips carry am/pm color */
 .chip[aria-pressed="true"] {
   background: var(--ink);
   color: var(--paper-light);
@@ -51,57 +50,55 @@
   font-weight: 600;
 }
 .chip[data-value="to_work"][aria-pressed="true"] {
-  background: var(--am);
-  color: var(--ink);
-  border-color: var(--am-deep);
+  background: var(--am); color: var(--ink); border-color: var(--am-deep);
 }
 .chip[data-value="from_work"][aria-pressed="true"] {
-  background: var(--pm);
-  color: var(--paper-light);
-  border-color: var(--pm-deep);
+  background: var(--pm); color: var(--paper-light); border-color: var(--pm-deep);
 }
 
-/* ---------- Paired-day diary rows ---------- */
+/* ---------- Paired-day log ---------- */
 .log-header {
   position: sticky;
   top: 0;
-  background: var(--paper);
+  z-index: 1;
   display: grid;
-  grid-template-columns: 52px 32px 24px 36px 1fr 44px 24px 36px 28px;
-  gap: var(--sp-2);
+  grid-template-columns: 96px 1fr 1fr;
+  background: var(--paper);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink-muted);
-  border-bottom: 1px solid var(--ink-line);
-  padding: var(--sp-2) var(--sp-1);
-  z-index: 1;
+  border: 1px solid var(--ink-line);
+  border-bottom: none;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
 }
+.log-header > span {
+  padding: 9px 14px;
+  border-right: 1px dashed var(--ink-line);
+}
+.log-header > span:last-child { border-right: none; }
 
 .log-list {
   list-style: none;
   margin: 0;
   padding: 0;
   border: 1px solid var(--ink-line);
-  border-radius: var(--r-sm);
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
   overflow: hidden;
   background: var(--paper-light);
   background-image: var(--paper-texture);
 }
 
-.log-list .pair-row {
+.log-day {
   display: grid;
-  grid-template-columns: 52px 32px 24px 36px 1fr 44px 24px 36px 28px;
-  gap: var(--sp-2);
-  align-items: center;
-  min-height: 44px;
-  padding: var(--sp-3) var(--sp-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
+  grid-template-columns: 96px 1fr 1fr;
+  align-items: stretch;
   position: relative;
+  font-family: var(--font-body);
+  color: var(--ink);
 }
-.log-list .pair-row:not(:first-child)::before {
+.log-day:not(:first-child)::before {
   content: "";
   position: absolute;
   left: 0; right: 0; top: 0;
@@ -109,49 +106,104 @@
   background-image: repeating-linear-gradient(to right, var(--ink-line) 0 4px, transparent 4px 8px);
 }
 
-/* open = boarded, not yet alighted = live/on-road → leaf accent (not sun) */
-.log-list .pair-row.open { box-shadow: inset 3px 0 0 var(--leaf); background: rgba(92, 140, 74, 0.12); }
-.log-list .pair-row.orphan { box-shadow: inset 3px 0 0 var(--ink-faint); }
+.log-day .day-stamp {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--paper);
+  border-right: 1px dashed var(--ink-line);
+}
+.log-day .day-stamp .d {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+  font-feature-settings: "tnum" 1;
+}
+.log-day .day-stamp .wd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-muted);
+}
+.log-day.today .day-stamp { background: rgba(217, 164, 65, 0.12); box-shadow: inset 3px 0 0 var(--am); }
 
-.log-list .mono { font-feature-settings: "tnum" 1; }
-.log-list .date { color: var(--ink); font-weight: 500; }
-.log-list .wkday { color: var(--ink-muted); letter-spacing: 0.06em; }
-.log-list .dir {
-  display: inline-flex;
+.log-day .leg {
+  display: grid;
+  grid-template-columns: 20px 1fr auto auto auto;
   align-items: center;
-  justify-content: center;
-  width: 22px; height: 22px;
-  border-radius: var(--r-full);
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-3);
+  border-right: 1px dashed var(--ink-line);
+  min-width: 0;
+}
+.log-day .leg:last-child { border-right: none; }
+.log-day .leg .dir {
+  font-family: var(--font-mono);
   font-weight: 700;
-  background: var(--am-soft);
-  color: var(--am-deep);
+  text-align: center;
 }
-.log-list .pair-row[data-direction="from_work"] .dir { background: var(--pm-soft); color: var(--pm-deep); }
-.log-list .dir-label { font-family: var(--font-body); font-weight: 500; color: var(--ink); }
-.log-list .trip { font-family: var(--font-mono); color: var(--ink); letter-spacing: 0.02em; }
-.log-list .duration { font-size: var(--fs-xs); color: var(--ink-muted); text-align: right; }
-.log-list .duration.active {
-  color: var(--leaf-deep);
-  font-weight: 600;
-  font-family: var(--font-hand);
-  font-size: var(--fs-hand);
+.log-day .leg.am .dir { color: var(--am-deep); }
+.log-day .leg.pm .dir { color: var(--pm-deep); }
+.log-day .leg .times {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.log-list .wx { display: inline-flex; align-items: center; justify-content: center; color: var(--ink-muted); }
-.log-list .wx.unavailable { color: var(--ink-faint); opacity: 0.5; }
-.log-list .temp { font-family: var(--font-mono); font-feature-settings: "tnum" 1; color: var(--ink); }
-.log-list .delete-btn {
+.log-day .leg .times b { color: var(--ink); font-weight: 500; }
+.log-day .leg .times .arr { color: var(--ink-faint); margin: 0 3px; }
+.log-day .leg .dur .min {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum" 1;
+}
+.log-day .leg .dur .min .unit { font-size: 9px; color: var(--ink-muted); letter-spacing: 0.08em; margin-left: 1px; }
+.log-day .leg .dur .min.active { color: var(--leaf-deep); }
+.log-day .leg .dur .min.muted { color: var(--ink-faint); }
+.log-day .leg .wx {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-muted);
+  font-feature-settings: "tnum" 1;
+}
+.log-day .leg .wx.unavailable { color: var(--ink-faint); opacity: 0.6; }
+.log-day .leg.empty {
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(180, 160, 120, 0.07) 6px 7px);
+}
+
+.log-day .leg .delete-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px; height: 28px;
+  width: 26px; height: 26px;
   border: 1px solid var(--ink-line);
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--ink-muted);
-  transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+  transition: background var(--motion-fast) var(--ease-out);
 }
-.log-list .delete-btn:active { background: var(--surface-press); }
-.log-list .delete-btn.confirm {
+.log-day .leg .delete-btn:active { background: var(--surface-press); }
+.log-day .leg .delete-btn.confirm {
   background: var(--danger-bg);
   border-color: var(--danger);
   color: var(--danger);
@@ -161,8 +213,9 @@
   font-size: var(--fs-xs);
   font-weight: 600;
 }
-.log-list .delete-btn[disabled] { opacity: 0.5; pointer-events: none; }
+.log-day .leg .delete-btn[disabled] { opacity: 0.5; pointer-events: none; }
 
+/* Neutral ink CTA — generic navigation */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -176,16 +229,9 @@
   border: 1px solid transparent;
   background: transparent;
   color: var(--ink);
-  transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+  transition: background var(--motion-fast) var(--ease-out);
 }
-
-/* Neutral ink CTA — generic navigation, not a morning/to_work action, so
-   the spec forbids the sun accent here (design-system-slow-town-station.md:105). */
-.btn-primary {
-  background: var(--ink);
-  color: var(--paper-light);
-  border-color: var(--ink);
-}
+.btn-primary { background: var(--ink); color: var(--paper-light); border-color: var(--ink); }
 .btn-primary:active { background: var(--ink-soft); }
 
 .empty-state {
@@ -199,31 +245,18 @@
   text-align: center;
   list-style: none;
 }
+.empty-state .icon-lg { width: 48px; height: 48px; color: var(--ink-faint); }
 
-.empty-state .icon-lg {
-  width: 48px; height: 48px;
-  color: var(--ink-faint);
-}
+.log-list .skeleton-row { display: block; padding: var(--sp-3) var(--sp-4); }
 
-@media (max-width: 480px) {
+/* ---------- Mobile: stack the two legs under the day stamp ---------- */
+@media (max-width: 560px) {
   .log-header { display: none; }
-
-  .log-list .pair-row {
-    grid-template-columns: auto auto 24px auto 1fr auto;
-    grid-template-areas:
-      "date wkday dir label duration delete"
-      "trip trip trip wx temp delete";
-    column-gap: var(--sp-2);
-    row-gap: 3px;
-    padding: var(--sp-3);
+  .log-day {
+    grid-template-columns: 64px 1fr;
+    grid-template-areas: "stamp am" "stamp pm";
   }
-  .log-list .pair-row > .date { grid-area: date; }
-  .log-list .pair-row > .wkday { grid-area: wkday; }
-  .log-list .pair-row > .dir { grid-area: dir; }
-  .log-list .pair-row > .dir-label { grid-area: label; }
-  .log-list .pair-row > .trip { grid-area: trip; }
-  .log-list .pair-row > .duration { grid-area: duration; text-align: right; }
-  .log-list .pair-row > .wx { grid-area: wx; justify-self: end; }
-  .log-list .pair-row > .temp { grid-area: temp; text-align: right; }
-  .log-list .pair-row > .delete-btn { grid-area: delete; align-self: center; }
+  .log-day .day-stamp { grid-area: stamp; border-right: 1px dashed var(--ink-line); }
+  .log-day .leg.am { grid-area: am; border-right: none; }
+  .log-day .leg.pm { grid-area: pm; border-right: none; border-top: 1px dashed var(--ink-line); }
 }

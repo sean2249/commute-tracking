@@ -58,50 +58,70 @@ function render() {
     listEl.innerHTML = `
       <li class="empty-state">
         <div class="icon-lg">${ICONS.list(48)}</div>
-        <div>${allEvents.length === 0 ? '尚無紀錄。' : '此篩選下無資料。'}</div>
+        <div>${allEvents.length === 0 ? '票根簿還是空的。回首頁紀錄第一班車。' : '這個篩選下沒有票根。'}</div>
         ${allEvents.length === 0 ? '<a href="index.html" class="btn btn-primary">回首頁紀錄</a>' : ''}
       </li>`;
     return;
   }
 
-  listEl.innerHTML = pairs.map(renderPairRow).join('');
+  // Group pairs into days, each with an AM (to_work) + PM (from_work) leg.
+  const byDate = new Map();
+  for (const p of pairs) {
+    let day = byDate.get(p.local_date);
+    if (!day) {
+      const ref = p.alight || p.board;
+      day = { date: p.local_date, weekday: ref.weekday, am: null, pm: null };
+      byDate.set(p.local_date, day);
+    }
+    if (p.direction === 'to_work') day.am = p; else day.pm = p;
+  }
+  const days = [...byDate.values()].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+
+  listEl.innerHTML = days.map((d) => renderDay(d, today)).join('');
   listEl.querySelectorAll('.delete-btn').forEach((b) => {
     b.addEventListener('click', (e) => handlePairDelete(e, b));
   });
 }
 
-function renderPairRow(p) {
-  const primary = p.board || p.alight;
+function renderDay(d, today) {
+  const isToday = d.date === today;
+  const dd = d.date.slice(8, 10);
+  const wd = weekdayShort(d.weekday).toUpperCase();
+  return `
+    <li class="log-day${isToday ? ' today' : ''}">
+      <div class="day-stamp"><span class="d">${dd}</span><span class="wd">${wd}</span></div>
+      ${renderLeg(d.am, 'am', 'to_work')}
+      ${renderLeg(d.pm, 'pm', 'from_work')}
+    </li>
+  `;
+}
+
+function renderLeg(p, cls, direction) {
+  if (!p) {
+    return `<div class="leg ${cls} empty">— ${cls === 'am' ? '無上班' : '無下班'} —</div>`;
+  }
   const ref = p.alight || p.board;
   const wxUnavailable = isWeatherUnavailable(ref.weather);
   const tempStr = wxUnavailable || ref.temp_c == null ? '—°' : `${ref.temp_c}°`;
   const boardTime = p.board ? formatTime(p.board.local_time) : '⋯';
   const alightTime = p.alight ? formatTime(p.alight.local_time) : '⋯';
-  let duration;
-  if (p.durationMin != null) {
-    duration = `<span class="duration mono">${p.durationMin}m</span>`;
-  } else if (!p.alight) {
-    duration = '<span class="duration active">active</span>';
-  } else {
-    duration = '<span class="duration muted">—</span>';
-  }
-  const trash = ICONS.trash ? ICONS.trash(16) : '×';
-  const rowClass = !p.alight ? ' open' : (!p.board ? ' orphan' : '');
+  let dur;
+  if (p.durationMin != null) dur = `<span class="min">${p.durationMin}<span class="unit">min</span></span>`;
+  else if (!p.alight) dur = '<span class="min active">···</span>';
+  else dur = '<span class="min muted">—</span>';
+  const trash = ICONS.trash ? ICONS.trash(14) : '×';
   return `
-    <li class="pair-row${rowClass}" id="row-${primary.id}" data-direction="${p.direction}">
-      <span class="mono date">${formatDate(p.local_date)}</span>
-      <span class="wkday muted">${weekdayShort(primary.weekday)}</span>
-      <span class="dir">${DIRECTION_ARROWS[p.direction] || ''}</span>
-      <span class="dir-label">${DIRECTION_LABELS[p.direction] || ''}</span>
-      <span class="trip mono">${boardTime} → ${alightTime}</span>
-      ${duration}
-      <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(ref.weather)}</span>
-      <span class="temp mono">${tempStr}</span>
+    <div class="leg ${cls}" data-direction="${direction}">
+      <span class="dir">${DIRECTION_ARROWS[direction] || ''}</span>
+      <span class="times"><b>${boardTime}</b><span class="arr">→</span><b>${alightTime}</b></span>
+      <span class="dur">${dur}</span>
+      <span class="wx${wxUnavailable ? ' unavailable' : ''}">${weatherIcon(ref.weather, 14)}<span class="temp">${tempStr}</span></span>
       <button class="delete-btn" type="button"
               data-board-id="${p.board ? p.board.id : ''}"
               data-alight-id="${p.alight ? p.alight.id : ''}"
               aria-label="刪除">${trash}</button>
-    </li>
+    </div>
   `;
 }
 
@@ -123,6 +143,8 @@ async function handlePairDelete(ev, btn) {
   }
   btn.setAttribute('disabled', '');
   btn.innerHTML = '<span>刪除中…</span>';
+  const leg = btn.closest('.leg') || btn.closest('li');
+  if (leg) leg.classList.add('tearing'); // torn ticket
   const boardId = btn.dataset.boardId;
   const alightId = btn.dataset.alightId;
   const ops = [];
@@ -141,7 +163,7 @@ async function handlePairDelete(ev, btn) {
 }
 
 function skeletonRows(n) {
-  return Array.from({ length: n }).map(() => '<li class="pair-row skeleton-row"><div class="skeleton" style="height: 32px; margin: 4px; grid-column: 1 / -1;"></div></li>').join('');
+  return Array.from({ length: n }).map(() => '<li class="skeleton-row"><span class="skeleton" style="display:block;height:18px;width:90%"></span></li>').join('');
 }
 
 function showError(msg) {

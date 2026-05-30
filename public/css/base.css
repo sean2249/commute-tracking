@@ -12,9 +12,15 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* Day/night crossfade (the "lerp" into 07:00 / 17:00). Snaps under
+   reduced-motion. Component surfaces inherit via their own bg tokens. */
+html, body { transition: background-color 0.7s ease, color 0.7s ease; }
+@media (prefers-reduced-motion: reduce) { html, body { transition: none; } }
+
 body {
   min-height: 100vh;
   min-height: 100dvh;
+  overscroll-behavior-y: contain;
   /* Pastoral page: cream paper with two soft riso overprints + hairline texture */
   background-color: var(--bg);
   background-image:
@@ -212,6 +218,14 @@ a {
 }
 
 .shake { animation: shake 200ms var(--ease-out); }
+
+/* Torn ticket — a deleted/voided trip tears away (A14). */
+@keyframes tear {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: translateX(10px) rotate(1.2deg); clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 90%); }
+}
+.tearing { animation: tear 240ms ease-in forwards; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .tearing { animation: none; opacity: 0.35; } }
 
 /* ---------- Toast ---------- */
 .toast-error {
