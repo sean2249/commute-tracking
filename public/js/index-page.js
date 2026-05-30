@@ -247,7 +247,12 @@ async function handlePrimary() {
   }
 
   if (event === 'board') {
-    setOpenBoard({ id: data.id, direction, event_at: data.logged_at });
+    let pred = null;
+    if (data.prediction) {
+      const { eta, swing } = buildEtaText(formatTime(data.local_time), data.prediction);
+      pred = { eta, swing, n: data.prediction.n };
+    }
+    setOpenBoard({ id: data.id, direction, event_at: data.logged_at, pred });
     scheduleReminder();
     startUndoWindow(data.id);
   } else {
@@ -364,12 +369,16 @@ function renderStrip(payload) {
     const undoHtml = undoLeft > 0
       ? `<button class="undo-pill" id="undo-pill" type="button" aria-label="撤銷上車">undo <span class="count mono">${undoLeft}</span></button>`
       : '';
+    const etaHtml = ob.pred
+      ? `<div class="eta">ETA ${ob.pred.eta} <span class="small">· n=${ob.pred.n} · ±${ob.pred.swing}min</span></div>`
+      : '<div class="row"><span class="pred-pending">ETA 累積中</span></div>';
     strip.innerHTML = `
       <div class="row">
         <span class="time">${startedAt}</span>
         <span class="label">${dirLabel} · 上車</span>
         ${undoHtml}
       </div>
+      ${etaHtml}
       <div class="row muted"><span class="small">追蹤中 · ${minsAgo} 分鐘前</span></div>
     `;
     const ub = document.getElementById('undo-pill');

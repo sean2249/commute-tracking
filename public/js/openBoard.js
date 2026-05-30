@@ -19,6 +19,7 @@ export function setOpenBoard(ob) {
       direction: ob.direction,
       event_at: ob.event_at,
       notifiedAt: ob.notifiedAt ?? null,
+      pred: ob.pred ?? null,
     }));
   } catch (err) {
     console.warn('[openBoard] localStorage write failed', err);
