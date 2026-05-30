@@ -333,6 +333,9 @@ async function undoBoard(boardId) {
   }
   clearOpenBoard();
   latestEvent = null;
+  // refreshRecent only re-renders the strip when an open board exists, so
+  // reset it to idle here — otherwise it stays stuck on the undone "tracking" view.
+  renderStrip({ state: 'empty' });
   await refreshRecent();
 }
 

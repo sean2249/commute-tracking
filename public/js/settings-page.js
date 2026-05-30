@@ -34,15 +34,19 @@ form.addEventListener('submit', (e) => {
   setStations(stations);
 
   const remind = Math.round(Number($('remind-min').value));
-  const discard = Math.round(Number($('discard-min').value));
+  let discard = Math.round(Number($('discard-min').value));
+  let note = '已儲存。';
   if (Number.isFinite(remind) && remind > 0) setRemindMin(remind);
-  if (Number.isFinite(discard) && discard > 0) setDiscardMin(discard);
-
-  if (Number.isFinite(remind) && Number.isFinite(discard) && discard <= remind) {
-    status.textContent = '已儲存,但「捨棄時間」最好大於「提醒時間」。';
-  } else {
-    status.textContent = '已儲存。';
+  if (Number.isFinite(discard) && discard > 0) {
+    // Discard must be strictly greater than the reminder, else it could
+    // auto-discard before/at the reminder. Clamp before persisting.
+    if (Number.isFinite(remind) && remind > 0 && discard <= remind) {
+      discard = remind + 1;
+      note = `已儲存。「捨棄時間」已自動調整為 ${discard} 分(需大於提醒時間)。`;
+    }
+    setDiscardMin(discard);
   }
+  status.textContent = note;
   load();
   setTimeout(() => { if (status.textContent.startsWith('已儲存')) status.textContent = ''; }, 2600);
 });

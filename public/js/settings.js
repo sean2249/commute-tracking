@@ -17,6 +17,7 @@ export function getStations() {
     const raw = localStorage.getItem(K_STATIONS);
     if (raw) {
       const s = JSON.parse(raw);
+      if (!s) return DEFAULT_STATIONS; // guard JSON.parse('null')
       return {
         home: {
           cn: (s.home && s.home.cn) || DEFAULT_STATIONS.home.cn,
