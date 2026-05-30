@@ -347,7 +347,9 @@ function renderStrip(payload) {
   if (payload.state === 'empty') {
     strip.dataset.state = 'empty';
     delete strip.dataset.direction;
-    strip.innerHTML = '<div>早安。準備好就按下方上車。</div>';
+    const h = new Date().getHours();
+    const greet = h < 11 ? '早安' : (h < 17 ? '午安' : '晚安');
+    strip.innerHTML = `<div>${greet}。準備好就按下方上車。</div>`;
     return;
   }
   if (payload.state === 'tracking') {

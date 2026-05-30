@@ -151,14 +151,6 @@
   font-size: var(--fs-base);
   background-image: none;
 }
-.status-strip .bus {
-  width: 64px;
-  height: 48px;
-  object-fit: contain;
-  margin-bottom: var(--sp-1);
-}
-/* the bus only belongs in the empty "waiting" state */
-.status-strip:not([data-state="empty"]) .bus { display: none; }
 
 .status-strip[data-state="locating"] .row,
 .status-strip[data-state="locating"] .weather { opacity: 0.6; }
