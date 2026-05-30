@@ -193,9 +193,9 @@
   will-change: left, transform;
 }
 
-/* State A (morning wait) / C (evening wait): bus parked near the stop */
-.scene[data-state="A"] .bus { left: 64%; }
-.scene[data-state="C"] .bus { left: 18%; }
+/* State A (morning wait, to_work) parks LEFT; C (evening wait, from_work) parks RIGHT */
+.scene[data-state="A"] .bus { left: 18%; }
+.scene[data-state="C"] .bus { left: 64%; }
 
 /* State B: lurching across the road (kick-and-stop) + subtle bob */
 .scene[data-state="B"][data-dir="to_work"] .bus {
@@ -243,8 +243,8 @@
 /* Reduced motion: bus stays on the road but does not move */
 @media (prefers-reduced-motion: reduce) {
   .scene .bus { animation: none !important; }
-  .scene[data-state="B"][data-dir="to_work"] .bus { left: 52%; }
-  .scene[data-state="B"][data-dir="from_work"] .bus { left: 40%; }
+  .scene[data-state="B"][data-dir="to_work"] .bus { left: 24%; }
+  .scene[data-state="B"][data-dir="from_work"] .bus { left: 66%; }
 }
 
 @media (min-width: 720px) {
