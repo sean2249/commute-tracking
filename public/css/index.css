@@ -200,6 +200,25 @@
   animation: live-pulse 1.6s ease-in-out infinite;
   flex-shrink: 0;
 }
+.status-strip .undo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 12px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--leaf-deep);
+  background: var(--paper);
+  color: var(--leaf-deep);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: background var(--motion-fast) var(--ease-out);
+}
+.status-strip .undo-pill .count { color: var(--ink-muted); font-feature-settings: "tnum" 1; }
+.status-strip .undo-pill:active { background: var(--surface-press); }
+
 .status-strip[data-state="error"] {
   border-color: var(--danger);
 }

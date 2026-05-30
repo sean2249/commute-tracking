@@ -234,9 +234,11 @@ async function handlePrimary() {
   if (event === 'board') {
     setOpenBoard({ id: data.id, direction, event_at: data.logged_at });
     scheduleReminder();
+    startUndoWindow(data.id);
   } else {
     cancelReminder();
     clearOpenBoard();
+    stopUndoWindow();
   }
 
   directionOverride = null;
@@ -275,6 +277,45 @@ function buildEtaText(time, pred) {
   return { eta, swing };
 }
 
+// ----- Undo window: 8s to cancel a just-logged board -----
+let undoState = null; // { boardId, until }
+let undoTicker = null;
+
+function startUndoWindow(boardId) {
+  undoState = { boardId, until: Date.now() + 8000 };
+  if (undoTicker) clearInterval(undoTicker);
+  undoTicker = setInterval(() => {
+    const ob = getOpenBoard();
+    if (!undoState || Date.now() >= undoState.until || !ob || ob.id !== undoState.boardId) {
+      stopUndoWindow();
+      return;
+    }
+    renderStrip({ state: 'tracking', openBoard: ob });
+  }, 1000);
+}
+
+function stopUndoWindow() {
+  if (undoTicker) { clearInterval(undoTicker); undoTicker = null; }
+  const wasActive = !!undoState;
+  undoState = null;
+  if (wasActive) {
+    const ob = getOpenBoard();
+    if (ob) renderStrip({ state: 'tracking', openBoard: ob });
+  }
+}
+
+async function undoBoard(boardId) {
+  stopUndoWindow();
+  cancelReminder();
+  const { error } = await deleteEvent(boardId);
+  if (error && error.code !== 'PGRST116') {
+    showError(error.message || '撤銷失敗');
+  }
+  clearOpenBoard();
+  latestEvent = null;
+  await refreshRecent();
+}
+
 function renderStrip(payload) {
   if (payload.state === 'locating') {
     strip.dataset.state = 'locating';
@@ -301,13 +342,21 @@ function renderStrip(payload) {
     const dirLabel = DIRECTION_LABELS[ob.direction];
     const startedAt = formatTime(new Date(ob.event_at));
     const minsAgo = Math.max(0, Math.round((Date.now() - new Date(ob.event_at).getTime()) / 60000));
+    const undoLeft = (undoState && undoState.boardId === ob.id)
+      ? Math.max(0, Math.ceil((undoState.until - Date.now()) / 1000)) : 0;
+    const undoHtml = undoLeft > 0
+      ? `<button class="undo-pill" id="undo-pill" type="button" aria-label="撤銷上車">undo <span class="count mono">${undoLeft}</span></button>`
+      : '';
     strip.innerHTML = `
       <div class="row">
         <span class="time">${startedAt}</span>
         <span class="label">${dirLabel} · 上車</span>
+        ${undoHtml}
       </div>
       <div class="row muted"><span class="small">追蹤中 · ${minsAgo} 分鐘前</span></div>
     `;
+    const ub = document.getElementById('undo-pill');
+    if (ub) ub.addEventListener('click', () => undoBoard(ob.id));
     return;
   }
 
