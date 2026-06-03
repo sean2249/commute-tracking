@@ -7,7 +7,7 @@ const listEl = document.getElementById('log-list');
 const chipBar = document.getElementById('filter-chips');
 
 const DIRECTION_LABELS = { to_work: '上班', from_work: '下班' };
-const DIRECTION_ARROWS = { to_work: '↑', from_work: '↓' };
+const DIRECTION_ARROWS = { to_work: '→', from_work: '←' };
 
 let allEvents = [];
 let filters = { status: null, direction: null, weather: null };

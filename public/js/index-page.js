@@ -18,7 +18,7 @@ const sceneCaption = document.getElementById('scene-caption');
 
 const DIRECTION_LABELS = { to_work: '上班', from_work: '下班' };
 const EVENT_LABELS = { board: '上車', alight: '下車' };
-const DIRECTION_ARROWS = { to_work: '↑', from_work: '↓' };
+const DIRECTION_ARROWS = { to_work: '→', from_work: '←' };
 // Hand verbs (Caveat is latin-only): board AM / board PM / alight.
 const HAND_VERB = { board_to_work: 'all aboard', board_from_work: 'heading home', alight: 'all off' };
 const LONG_PRESS_MS = 500;
