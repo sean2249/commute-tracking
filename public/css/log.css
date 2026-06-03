@@ -154,9 +154,6 @@
   color: var(--ink-muted);
   font-feature-settings: "tnum" 1;
   white-space: nowrap;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .log-day .leg .times b { color: var(--ink); font-weight: 500; }
 .log-day .leg .times .arr { color: var(--ink-faint); margin: 0 3px; }
@@ -259,4 +256,27 @@
   .log-day .day-stamp { grid-area: stamp; border-right: 1px dashed var(--ink-line); }
   .log-day .leg.am { grid-area: am; border-right: none; }
   .log-day .leg.pm { grid-area: pm; border-right: none; border-top: 1px dashed var(--ink-line); }
+
+  /* Two lines per leg: full time on top, duration / weather / delete below */
+  .log-day .leg {
+    grid-template-columns: 20px auto auto 1fr;
+    grid-template-areas:
+      "dir  times times times"
+      "dir  dur   wx    del";
+    column-gap: var(--sp-2);
+    row-gap: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3);
+  }
+  .log-day .leg .dir        { grid-area: dir; align-self: center; }
+  .log-day .leg .times      { grid-area: times; }
+  .log-day .leg .dur        { grid-area: dur; }
+  .log-day .leg .wx         { grid-area: wx; }
+  .log-day .leg .delete-btn { grid-area: del; justify-self: end; }
+
+  /* Uniform text size across the two lines */
+  .log-day .leg .times,
+  .log-day .leg .dur .min,
+  .log-day .leg .wx          { font-size: var(--fs-sm); }
+  .log-day .leg .dur .min .unit,
+  .log-day .leg .wx .temp    { font-size: var(--fs-xs); }
 }
