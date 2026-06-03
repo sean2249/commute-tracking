@@ -325,29 +325,43 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale, dire
   });
 }
 
-function renderBoarding(durations) {
-  const rows = durations.filter((d) => d.board_minutes != null);
-  const xScale = {
+// Build a tidy clock x-axis from the data: zoom to the active window instead of
+// always spanning a full day. Pads 30 min each side and snaps to whole hours so
+// the bounds and ticks land on clean times; step aims for ~5 hourly-aligned ticks.
+function boardingXScale(rows) {
+  const mins = rows.map((d) => d.board_minutes);
+  const lo = mins.length ? Math.min(...mins) : 0;
+  const hi = mins.length ? Math.max(...mins) : 1440;
+  const min = Math.max(0, Math.floor((lo - 30) / 60) * 60);
+  const max = Math.min(1440, Math.ceil((hi + 30) / 60) * 60);
+  const stepSize = Math.max(60, Math.ceil((max - min) / 5 / 60) * 60);
+  return {
     type: 'linear',
-    min: 0,
-    max: 1440,
+    min,
+    max,
     ticks: {
       color: cssVar('--fg-muted'),
       font: { family: cssVar('--font-mono'), size: 11 },
-      stepSize: 180,
+      stepSize,
       callback: (v) => fmtClock(v),
     },
     title: { display: true, text: 'boarding time', color: cssVar('--fg-muted') },
   };
-  // Split into one chart per direction (上班 / 下班).
+}
+
+function renderBoarding(durations) {
+  const rows = durations.filter((d) => d.board_minutes != null);
+  // Split into one chart per direction (上班 / 下班); each gets an x-axis scaled
+  // to its own boarding window.
   DIRECTIONS.forEach((dir) => {
+    const dirRows = rows.filter((d) => d.direction === dir);
     renderScatterFactor({
       canvasId: `chart-boarding-${dir}`,
       sectionId: `section-boarding-${dir}`,
       nId: `n-boarding-${dir}`,
-      rows: rows.filter((d) => d.direction === dir),
+      rows: dirRows,
       xOf: (d) => d.board_minutes,
-      xScale,
+      xScale: boardingXScale(dirRows),
       directions: [dir],
     });
   });
