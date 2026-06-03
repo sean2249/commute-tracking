@@ -28,45 +28,47 @@
   <div class="aggregate-row">
     <div class="aggregate-cell"><div id="agg-events" class="num">—</div><div class="label">Events</div></div>
     <div class="aggregate-cell"><div id="agg-paired" class="num">—</div><div class="label">Paired</div></div>
-    <div class="aggregate-cell"><div id="agg-avg" class="num">—</div><div class="label">7d avg</div></div>
+    <div class="aggregate-cell"><div id="agg-median" class="num">—</div><div class="label">Median</div></div>
     <div class="aggregate-cell"><div id="agg-missing" class="num">—</div><div class="label">Missing alight</div></div>
   </div>
 
-  <div class="charts-grid">
-    <section id="section-trend" class="chart-section">
-      <header>
-        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration trend</h2>
-        <span id="n-trend" class="n-count">n=0</span>
-      </header>
-      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
-      <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
-    </section>
+  <p class="charts-intro">每張圖的 Y 軸都是通勤時間（duration），呈現各因素對通勤時間的整體影響。太陽色＝上班、黃泥色＝下班。</p>
 
-    <section id="section-scatter" class="chart-section">
+  <div class="charts-grid">
+    <section id="section-weekday" class="chart-section">
       <header>
-        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Boarding time</h2>
-        <span id="n-scatter" class="n-count">n=0</span>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration by weekday</h2>
+        <span id="n-weekday" class="n-count">n=0</span>
       </header>
       <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
-      <div class="chart-wrap"><canvas id="chart-scatter"></canvas></div>
+      <div class="chart-wrap"><canvas id="chart-weekday"></canvas></div>
     </section>
 
     <section id="section-weather" class="chart-section">
       <header>
-        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> By weather</h2>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration by weather</h2>
         <span id="n-weather" class="n-count">n=0</span>
       </header>
-      <span class="chart-low-sample-banner" style="display:none">分組樣本偏少，請謹慎解讀</span>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
       <div class="chart-wrap"><canvas id="chart-weather"></canvas></div>
     </section>
 
-    <section id="section-weekday" class="chart-section">
+    <section id="section-boarding" class="chart-section">
       <header>
-        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> By weekday</h2>
-        <span id="n-weekday" class="n-count">n=0</span>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration by boarding time</h2>
+        <span id="n-boarding" class="n-count">n=0</span>
       </header>
-      <span class="chart-low-sample-banner" style="display:none">分組樣本偏少，請謹慎解讀</span>
-      <div class="chart-wrap"><canvas id="chart-weekday"></canvas></div>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-boarding"></canvas></div>
+    </section>
+
+    <section id="section-temp" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration by temperature</h2>
+        <span id="n-temp" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-temp"></canvas></div>
     </section>
   </div>
 
