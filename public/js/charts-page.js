@@ -109,10 +109,13 @@ function commonChartOptions() {
   };
 }
 
-function durationYScale(base) {
+// Bars start at 0 (truncated bar axes mislead); scatter charts auto-scale so the
+// point cloud isn't squashed into a thin band, with a little headroom via `grace`.
+function durationYScale(base, { beginAtZero = true } = {}) {
   return {
     ...base.scales.y,
-    beginAtZero: true,
+    beginAtZero,
+    ...(beginAtZero ? {} : { grace: '10%' }),
     title: { display: true, text: 'duration (min)', color: cssVar('--fg-muted') },
   };
 }
@@ -316,7 +319,7 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale, dire
       },
       scales: {
         x: { ...base.scales.x, ...xScale },
-        y: durationYScale(base),
+        y: durationYScale(base, { beginAtZero: false }),
       },
     },
   });
