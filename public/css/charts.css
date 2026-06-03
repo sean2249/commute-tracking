@@ -51,6 +51,14 @@
   letter-spacing: 0.14em;
 }
 
+.charts-intro {
+  margin: 0 0 var(--sp-6);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
 .chart-section {
   background: var(--paper-light);
   background-image: var(--paper-texture);
