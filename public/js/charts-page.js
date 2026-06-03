@@ -178,11 +178,33 @@ function lowSample(sectionId, n) {
   if (banner) banner.style.display = n > 0 && n < 10 ? 'inline-block' : 'none';
 }
 
-function renderEmpty(canvasId, msg = '尚無紀錄') {
+// Show an empty-state placeholder without removing the <canvas>, so a later
+// (stale-while-revalidate) render with data can still instantiate a chart.
+function showEmpty(canvasId, msg = '尚無紀錄') {
+  chartInstances[canvasId]?.destroy();
+  chartInstances[canvasId] = null;
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
+  canvas.style.display = 'none';
   const wrap = canvas.parentElement;
-  wrap.innerHTML = `<div class="chart-empty">${ICONS.list(32)}<div>${msg}</div></div>`;
+  let ph = wrap.querySelector('.chart-empty');
+  if (!ph) {
+    ph = document.createElement('div');
+    ph.className = 'chart-empty';
+    wrap.appendChild(ph);
+  }
+  ph.innerHTML = `${ICONS.list(32)}<div>${msg}</div>`;
+  ph.style.display = '';
+}
+
+// Reveal the canvas and hide any empty-state placeholder before (re)instantiating.
+function prepCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  canvas.style.display = '';
+  const ph = canvas.parentElement.querySelector('.chart-empty');
+  if (ph) ph.style.display = 'none';
+  return canvas;
 }
 
 // Grouped bar of median duration per category, split by direction.
@@ -190,7 +212,7 @@ function renderMedianBars({ canvasId, sectionId, nId, durations, categories, key
   setN(nId, durations.length);
   lowSample(sectionId, durations.length);
   if (durations.length === 0) {
-    renderEmpty(canvasId);
+    showEmpty(canvasId);
     return;
   }
   const present = categories.filter((c) => durations.some((d) => keyFn(d) === c));
@@ -207,7 +229,7 @@ function renderMedianBars({ canvasId, sectionId, nId, durations, categories, key
     };
   });
   chartInstances[canvasId]?.destroy();
-  chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
+  chartInstances[canvasId] = new Chart(prepCanvas(canvasId), {
     type: 'bar',
     data: { labels: present.map(labelFn), datasets },
     options: { ...base, scales: { ...base.scales, y: durationYScale(base) } },
@@ -243,7 +265,7 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale }) {
   setN(nId, rows.length);
   lowSample(sectionId, rows.length);
   if (rows.length === 0) {
-    renderEmpty(canvasId, '尚無樣本');
+    showEmpty(canvasId, '尚無樣本');
     return;
   }
   const base = commonChartOptions();
@@ -278,7 +300,7 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale }) {
     }
   });
   chartInstances[canvasId]?.destroy();
-  chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
+  chartInstances[canvasId] = new Chart(prepCanvas(canvasId), {
     type: 'scatter',
     data: { datasets },
     options: {

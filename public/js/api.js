@@ -30,10 +30,12 @@ if (!secret && !isUnlockPage) {
 
 export function clearSecret() {
   localStorage.removeItem(SECRET_KEY);
+  invalidateStats();
 }
 
 export function setSecret(value) {
   localStorage.setItem(SECRET_KEY, value);
+  invalidateStats();
 }
 
 // --- stats cache (stale-while-revalidate) ------------------------------------
@@ -45,7 +47,11 @@ export function setSecret(value) {
 export function getCachedStats() {
   try {
     const raw = localStorage.getItem(STATS_CACHE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Never serve another secret's cached stats (changed/cleared key on this device).
+    if (!parsed || parsed.secret !== secret) return null;
+    return parsed.data;
   } catch {
     return null;
   }
@@ -53,7 +59,7 @@ export function getCachedStats() {
 
 function setCachedStats(data) {
   try {
-    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({ secret, data }));
   } catch {
     /* quota / private mode — caching is best-effort */
   }
