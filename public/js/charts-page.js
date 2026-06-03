@@ -261,7 +261,8 @@ function renderWeather(durations) {
 }
 
 // Scatter of duration vs a numeric factor, split by direction, with a fit line.
-function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale }) {
+// `directions` limits which direction series are drawn (e.g. a single one per chart).
+function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale, directions = DIRECTIONS }) {
   setN(nId, rows.length);
   lowSample(sectionId, rows.length);
   if (rows.length === 0) {
@@ -270,7 +271,7 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale }) {
   }
   const base = commonChartOptions();
   const datasets = [];
-  DIRECTIONS.forEach((dir) => {
+  directions.forEach((dir) => {
     const pts = rows
       .filter((d) => d.direction === dir)
       .map((d) => ({ x: xOf(d), y: d.duration_min }));
@@ -323,24 +324,29 @@ function renderScatterFactor({ canvasId, sectionId, nId, rows, xOf, xScale }) {
 
 function renderBoarding(durations) {
   const rows = durations.filter((d) => d.board_minutes != null);
-  renderScatterFactor({
-    canvasId: 'chart-boarding',
-    sectionId: 'section-boarding',
-    nId: 'n-boarding',
-    rows,
-    xOf: (d) => d.board_minutes,
-    xScale: {
-      type: 'linear',
-      min: 0,
-      max: 1440,
-      ticks: {
-        color: cssVar('--fg-muted'),
-        font: { family: cssVar('--font-mono'), size: 11 },
-        stepSize: 180,
-        callback: (v) => fmtClock(v),
-      },
-      title: { display: true, text: 'boarding time', color: cssVar('--fg-muted') },
+  const xScale = {
+    type: 'linear',
+    min: 0,
+    max: 1440,
+    ticks: {
+      color: cssVar('--fg-muted'),
+      font: { family: cssVar('--font-mono'), size: 11 },
+      stepSize: 180,
+      callback: (v) => fmtClock(v),
     },
+    title: { display: true, text: 'boarding time', color: cssVar('--fg-muted') },
+  };
+  // Split into one chart per direction (上班 / 下班).
+  DIRECTIONS.forEach((dir) => {
+    renderScatterFactor({
+      canvasId: `chart-boarding-${dir}`,
+      sectionId: `section-boarding-${dir}`,
+      nId: `n-boarding-${dir}`,
+      rows: rows.filter((d) => d.direction === dir),
+      xOf: (d) => d.board_minutes,
+      xScale,
+      directions: [dir],
+    });
   });
 }
 

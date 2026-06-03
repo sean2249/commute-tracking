@@ -53,13 +53,22 @@
       <div class="chart-wrap"><canvas id="chart-weather"></canvas></div>
     </section>
 
-    <section id="section-boarding" class="chart-section">
+    <section id="section-boarding-to_work" class="chart-section">
       <header>
-        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Duration by boarding time</h2>
-        <span id="n-boarding" class="n-count">n=0</span>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Boarding time · To work</h2>
+        <span id="n-boarding-to_work" class="n-count">n=0</span>
       </header>
       <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
-      <div class="chart-wrap"><canvas id="chart-boarding"></canvas></div>
+      <div class="chart-wrap"><canvas id="chart-boarding-to_work"></canvas></div>
+    </section>
+
+    <section id="section-boarding-from_work" class="chart-section">
+      <header>
+        <h2><span data-icon="barChart" data-size="16" class="icon-sm"></span> Boarding time · From work</h2>
+        <span id="n-boarding-from_work" class="n-count">n=0</span>
+      </header>
+      <span class="chart-low-sample-banner" style="display:none">樣本偏少（n&lt;10），請謹慎解讀</span>
+      <div class="chart-wrap"><canvas id="chart-boarding-from_work"></canvas></div>
     </section>
 
     <section id="section-temp" class="chart-section">
