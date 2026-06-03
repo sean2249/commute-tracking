@@ -1,4 +1,4 @@
-import { fetchStats } from './api.js';
+import { fetchStats, getCachedStats } from './api.js';
 import { ICONS } from './icons.js';
 
 const WEEKDAY_LABELS = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -119,14 +119,24 @@ function durationYScale(base) {
 
 // --- load ---------------------------------------------------------------------
 
+// Stale-while-revalidate: paint instantly from the cached payload, then refresh
+// from the network and re-render only if the data actually changed.
 async function load() {
+  const cached = getCachedStats();
+  if (cached) render(cached);
+
   const { data, error } = await fetchStats();
   if (error) {
-    document.getElementById('agg-events').textContent = '—';
-    showError('載入統計失敗：' + error.message);
+    if (!cached) {
+      document.getElementById('agg-events').textContent = '—';
+      showError('載入統計失敗：' + error.message);
+    }
     return;
   }
+  if (!cached || JSON.stringify(data) !== JSON.stringify(cached)) render(data);
+}
 
+function render(data) {
   const durations = (data.durations || []).map((d) => ({
     direction: d.direction,
     weekday: Number(d.weekday),
