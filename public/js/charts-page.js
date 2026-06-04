@@ -167,6 +167,20 @@ function renderAggregates(t, durations) {
   set('agg-paired', t.paired ?? durations.length);
   set('agg-median', med == null ? null : Math.round(med), ' min');
   set('agg-missing', t.missing_alight ?? 0);
+
+  // Per-direction breakdown: median duration + trip count for each direction.
+  const byDir = groupBy(durations, (d) => d.direction);
+  const cellIds = {
+    to_work: ['agg-towork-dur', 'agg-towork-n'],
+    from_work: ['agg-fromwork-dur', 'agg-fromwork-n'],
+  };
+  DIRECTIONS.forEach((dir) => {
+    const rows = byDir[dir] || [];
+    const m = median(rows.map((r) => r.duration_min));
+    const [durId, nId] = cellIds[dir];
+    set(durId, m == null ? null : Math.round(m), ' min');
+    set(nId, rows.length);
+  });
 }
 
 function setN(id, n) {
