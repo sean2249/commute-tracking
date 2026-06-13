@@ -28,7 +28,8 @@
   background: var(--paper-light);
   background-image: var(--ticket-texture);
   border: 1px solid var(--r-edge);
-  border-radius: var(--r-sm);
+  /* Info panel, never a button — soft rounded corners, distinct from the sharp-cornered ticket below */
+  border-radius: var(--r-lg);
   padding: var(--sp-4);
   margin-bottom: var(--sp-6);
   box-shadow: var(--shadow-1);
@@ -155,29 +156,19 @@
 .status-strip[data-state="locating"] .row,
 .status-strip[data-state="locating"] .weather { opacity: 0.6; }
 
-/* Tracking = LIVE on the road. Leaf accent + sawtooth tear + pulsing dot. */
+/* Tracking = LIVE on the road. Leaf info panel with a left accent bar — NOT a ticket (no torn edges). */
 .status-strip[data-state="tracking"] {
   --r-edge: var(--leaf-deep);
   border-color: var(--leaf-deep);
   background: var(--leaf-soft);
+  overflow: hidden;
 }
 .status-strip[data-state="tracking"]::before {
   content: "";
   position: absolute;
-  left: -1px; right: -1px; top: -3px;
-  height: 5px;
-  background-image: radial-gradient(circle at 5px 50%, var(--bg) 2.2px, transparent 2.5px);
-  background-size: 10px 5px;
-  background-repeat: repeat-x;
-}
-.status-strip[data-state="tracking"]::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: -5px;
-  height: 6px;
-  background:
-    linear-gradient(135deg, transparent 50%, var(--leaf-deep) 50%) repeat-x left top / 8px 6px,
-    linear-gradient(225deg, transparent 50%, var(--leaf-deep) 50%) repeat-x left top / 8px 6px;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--leaf-deep);
 }
 .status-strip[data-state="tracking"] .time { color: var(--ink); }
 .status-strip[data-state="tracking"] .label { color: var(--leaf-deep); }
