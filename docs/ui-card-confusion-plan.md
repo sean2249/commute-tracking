@@ -13,17 +13,17 @@
 
 目標：讓「可點的（按鈕）」與「只顯示的（狀態卡）」在造型、層級、間距上明確分流，降低誤觸。三個方向皆以 **CSS 為主，不更動 `js/index-page.js` 的互動邏輯**。
 
-涉及檔案：
-- `public/css/index.css`（中間卡 `:24-216`、下方卡 `:218-453`）— 主要改動處
+涉及檔案（以 selector 定位，避免行號 stale）：
+- `public/css/index.css`（中間卡 `.status-strip` 系列、下方卡 `.primary-action` 系列）— 主要改動處
 - `public/css/tokens.css`（既有 token，重用，不新增）
-- `public/index.html:60-91`（僅方向 C 可能加一行提示文字 / glyph）
+- `public/index.html`（`#status-strip` / `.entry-buttons`；僅方向 C 可能加一行提示文字 / glyph）
 
-可重用的既有資源（**不要新造**）：
-- `--shadow-1`（淺）/ `--shadow-2`（深）`tokens.css:82-83`
-- `--surface-press` 按壓色 `tokens.css:79`
-- `--r-sm`(3px) / `--r-lg`(14px) `tokens.css:91,93`
-- `--sp-6`(24)/`--sp-8`(32)/`--sp-10`(40) 間距 `tokens.css:86-88`
-- 按鈕既有 `:active` 下沉動畫 `index.css:417-420`
+可重用的既有資源（**不要新造**，皆定義於 `tokens.css`）：
+- `--shadow-1`（淺）/ `--shadow-2`（深）
+- `--surface-press` 按壓色
+- `--r-sm`(3px) / `--r-lg`(14px)
+- `--sp-6`(24)/`--sp-8`(32)/`--sp-10`(40) 間距
+- 按鈕既有 `.primary-action:active` 下沉動畫
 - `--leaf` / `--leaf-deep` / `--leaf-soft` 綠色系（中間卡追蹤態）
 
 ---
@@ -32,9 +32,9 @@
 
 讓「會凸起的才可點」。
 
-1. **下方按鈕更像實體按鈕**：`.primary-action` 的 `box-shadow` 由 `--shadow-1` 改為 `--shadow-2`（`index.css:248`）；`:active` 時下沉動畫已存在，保留即可。可選：`pas-cn` 站名字級由 30px 微升、或加粗強化召喚力。
-2. **中間卡改為平面/內凹資訊面板**：在 `.status-strip`（`index.css:25-39`）移除 `box-shadow`（或改 `box-shadow: none`），改用淡內陰影 `box-shadow: inset 0 1px 2px rgba(0,0,0,.06)`；維持背景與綠色追蹤態不變。讓它「凹進去 = 不可按」。
-3. **拉開間距**：`.status-strip` 的 `margin-bottom` 由 `--sp-6` 加大到 `--sp-8`（`index.css:33`）。
+1. **下方按鈕更像實體按鈕**：`.primary-action` 的 `box-shadow` 由 `--shadow-1` 改為 `--shadow-2`；`:active` 時下沉動畫已存在，保留即可。可選：`pas-cn` 站名字級由 30px 微升、或加粗強化召喚力。
+2. **中間卡改為平面/內凹資訊面板**：在 `.status-strip` 移除 `box-shadow`（或改 `box-shadow: none`），改用淡內陰影 `box-shadow: inset 0 1px 2px rgba(0,0,0,.06)`；維持背景與綠色追蹤態不變。讓它「凹進去 = 不可按」。
+3. **拉開間距**：`.status-strip` 的 `margin-bottom` 由 `--sp-6` 加大到 `--sp-8`。
 
 範圍：純 `index.css` 改 3 處。視覺風格幾乎不變，最安全。
 
@@ -42,7 +42,7 @@
 
 把「車票感（打孔/撕邊/票紋理）」設為**唯一可點的訊號**。
 
-1. **中間卡去票券化**：在 `.status-strip[data-state="tracking"]` 移除鋸齒撕邊 `::before/::after`（`index.css:164-181`）與 `--ticket-texture`（`index.css:29`，改 `background-image: none`）。
+1. **中間卡去票券化**：在 `.status-strip[data-state="tracking"]` 移除鋸齒撕邊 `::before/::after`；票紋理 `--ticket-texture` 因 `background: var(--leaf-soft)` 簡寫已被清掉，無須額外處理。
 2. **換成資訊面板造型**：`.status-strip` 改用較大圓角 `--r-lg`，左側加一條 `--leaf` 色彩條（`border-left: 3px solid var(--leaf-deep)` 或 `::before` 直條），維持綠色但不再像票。
 3. **按鈕保留票券造型 + 暖色不動**（`.primary-action` 打孔 `::before/::after`、`pas-punch` 全留）。
 
@@ -53,7 +53,7 @@
 保留兩卡造型，主攻引導視線與避免誤觸。
 
 1. **加大間距**：同方向 A 第 3 點（`--sp-6`→`--sp-8`/`--sp-10`）。
-2. **按鈕加互動提示**：把現有幾乎隱形的 `.primary-action__hint`（`index.css:426-434`，8px、`--ink-faint`）內容/樣式強化為明確 CTA（例：「輕觸打卡」+ 箭頭 glyph），或在 `pas-punch` 的 `pas-ticks` 上方加一個輕觸 glyph。需在 `index.html:90` / `js` 設定文字。
+2. **按鈕加互動提示**：把現有幾乎隱形的 `.primary-action__hint`（8px、`--ink-faint`）內容/樣式強化為明確 CTA（例：「輕觸打卡」+ 箭頭 glyph），或在 `pas-punch` 的 `pas-ticks` 上方加一個輕觸 glyph。需在 `index.html` 的 `#primary-action-hint` / `js` 設定文字。
 3. **確保中間卡不吃誤觸**：在 `.status-strip` 非互動區設定 `pointer-events`，只放行 `.undo-pill`/`.retry-pill`，避免點到空白區誤觸（目前點空白雖無動作，但加上更保險），undo 膠囊保持 `pointer-events:auto`。
 
 範圍：`index.css` + 可能 `index.html`/`index-page.js` 一行文字。
@@ -63,6 +63,8 @@
 ## 建議落地順序
 
 A 為基礎（低風險、先做），再視效果疊加 B 的造型區隔；C 的「加大間距」併入 A，CTA 文字可選。三者不衝突，可組合。
+
+> **實際落地：方向 B（單獨）。** 比稿後選擇 B、未疊 A——A 的陰影/內凹在暗色主題對比太弱。`.status-strip` 改大圓角 `--r-lg`、tracking 態移除鋸齒撕邊並改用左側 `--leaf-deep` accent bar（重用 `::before` + `overflow:hidden`），按鈕維持撕邊票造型。同步 bump `sw.js` 的 `VERSION`。
 
 ## 驗證方式
 
