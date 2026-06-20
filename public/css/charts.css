@@ -32,10 +32,19 @@
   background: var(--ink-faint);
 }
 
-/* Directional breakdown cells carry the strict am/pm accent (sun = to_work,
-   clay = from_work) to match the "太陽色＝上班、黃泥色＝下班" legend. */
-.aggregate-cell--am::after { background: var(--am-deep); }
-.aggregate-cell--pm::after { background: var(--pm-deep); }
+/* Directional breakdown cells are filled with the strict am/pm tint (sun =
+   to_work, clay = from_work) to match the "太陽色＝上班、黃泥色＝下班" legend.
+   The whole cell carries the colour, so the neutral corner dot is dropped. */
+.aggregate-cell--am {
+  background: var(--am-soft);
+  border-color: var(--am-deep);
+}
+.aggregate-cell--pm {
+  background: var(--pm-soft);
+  border-color: var(--pm-deep);
+}
+.aggregate-cell--am::after,
+.aggregate-cell--pm::after { display: none; }
 
 /* Glance numerals stay mono + tnum for tabular alignment (spec §02/§06). */
 .aggregate-cell .num {
