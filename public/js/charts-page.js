@@ -131,7 +131,7 @@ async function load() {
   const { data, error } = await fetchStats();
   if (error) {
     if (!cached) {
-      document.getElementById('agg-events').textContent = '—';
+      document.getElementById('agg-paired').textContent = '—';
       showError('載入統計失敗：' + error.message);
     }
     return;
@@ -163,10 +163,8 @@ function renderAggregates(t, durations) {
     el.textContent = val == null ? '—' : (val + unit);
   };
   const med = median(durations.map((d) => d.duration_min));
-  set('agg-events', t.events ?? 0);
   set('agg-paired', t.paired ?? durations.length);
   set('agg-median', med == null ? null : Math.round(med), ' min');
-  set('agg-missing', t.missing_alight ?? 0);
 
   // Per-direction breakdown: median duration + trip count for each direction.
   const byDir = groupBy(durations, (d) => d.direction);
